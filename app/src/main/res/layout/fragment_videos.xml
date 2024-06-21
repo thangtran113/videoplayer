@@ -11,6 +11,13 @@
         android:layout_height="wrap_content"
         android:text="@string/total_videos"
         android:textColor="@color/black"
-        android:layout_margin="10dp"/>
+        android:layout_margin="10dp"
+        android:id="@+id/totalVideos"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="vertical"
+        android:id="@+id/videoRV"/>
 
 </androidx.appcompat.widget.LinearLayoutCompat>
