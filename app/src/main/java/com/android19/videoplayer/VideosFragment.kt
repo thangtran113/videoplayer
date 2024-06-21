@@ -16,13 +16,12 @@ class VideosFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_videos, container, false)
         val binding = FragmentVideosBinding.bind(view)
-
-
-
         binding.videoRV.setHasFixedSize(true)
         binding.videoRV.setItemViewCacheSize(10)
         binding.videoRV.layoutManager = LinearLayoutManager(requireContext())
-         binding.videoRV.adapter = VideoAdapter(requireContext(), MainActivity.videoList )
+        binding.videoRV.adapter = VideoAdapter(requireContext(), MainActivity.videoList )
+        binding.totalVideos.text = "total videos: ${MainActivity.folderList.size}"
+
         return view
     }
 
