@@ -18,7 +18,6 @@
         <activity
             android:name=".FoldersActivity"
             android:screenOrientation="portrait"
-            android:exported="false"
             tools:ignore="DiscouragedApi,LockedOrientationActivity" />
         <activity
             android:name=".MainActivity"

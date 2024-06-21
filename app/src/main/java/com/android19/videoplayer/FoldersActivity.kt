@@ -15,9 +15,12 @@ import com.android19.videoplayer.databinding.ActivityMainBinding
 import java.io.File
 
 class FoldersActivity : AppCompatActivity() {
+    private lateinit var adapter: VideoAdapter
+
     companion object{
         lateinit var currentFolderVideo: ArrayList<Video>
     }
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivityFoldersBinding.inflate(layoutInflater)
@@ -38,14 +41,21 @@ class FoldersActivity : AppCompatActivity() {
         finish()
         return true
     }
-    @SuppressLint("Range")
+    @SuppressLint("Range","InlineApi","Recycle")
     private fun getAllVideos(folderId: String): ArrayList<Video>{
         val  tempList = ArrayList<Video>()
         val selection = MediaStore.Video.Media.BUCKET_ID + "like?"
         val projection = arrayOf(
-            MediaStore.Video.Media.TITLE, MediaStore.Video.Media.SIZE, MediaStore.Video.Media._ID,
-            MediaStore.Video.Media.BUCKET_DISPLAY_NAME, MediaStore.Video.Media.DATA, MediaStore.Video.Media.DATE_ADDED, MediaStore.Video.Media.DURATION, MediaStore.Video.Media.BUCKET_ID  )
-        val cursor = this.contentResolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, projection, selection, arrayOf(folderId), MediaStore.Video.Media.DATE_ADDED + "DESC")
+            MediaStore.Video.Media.TITLE,
+            MediaStore.Video.Media.SIZE,
+            MediaStore.Video.Media._ID,
+            MediaStore.Video.Media.BUCKET_DISPLAY_NAME,
+            MediaStore.Video.Media.DATA,
+            MediaStore.Video.Media.DATE_ADDED,
+            MediaStore.Video.Media.DURATION,
+            MediaStore.Video.Media.BUCKET_ID  )
+        val cursor = this.contentResolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+            projection, selection, arrayOf(folderId), MediaStore.Video.Media.DATE_ADDED + "DESC")
         if (cursor != null)
             if (cursor.moveToNext())
                 do {

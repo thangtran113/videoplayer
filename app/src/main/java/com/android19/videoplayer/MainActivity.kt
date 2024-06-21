@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
                 ActivityCompat.requestPermissions(this, arrayOf(WRITE_EXTERNAL_STORAGE),13)
     }
 
-    @SuppressLint("Range")
+    @SuppressLint("Range", "SuspiciousIndentation")
     private fun getAllVideos(): ArrayList<Video>{
         val  tempList = ArrayList<Video>()
         val tempFolderList = ArrayList<String>()
