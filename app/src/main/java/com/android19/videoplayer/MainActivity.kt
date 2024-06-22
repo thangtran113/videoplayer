@@ -67,11 +67,17 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("Range", "SuspiciousIndentation")
     private fun getAllVideos(): ArrayList<Video>{
-        val  tempList = ArrayList<Video>()
+        val tempList = ArrayList<Video>()
         val tempFolderList = ArrayList<String>()
         val projection = arrayOf(MediaStore.Video.Media.TITLE, MediaStore.Video.Media.SIZE, MediaStore.Video.Media._ID,
-            MediaStore.Video.Media.BUCKET_DISPLAY_NAME, MediaStore.Video.Media.DATA, MediaStore.Video.Media.DATE_ADDED, MediaStore.Video.Media.DURATION, MediaStore.Video.Media.BUCKET_ID  )
-        val cursor = this.contentResolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, projection, null, null, MediaStore.Video.Media.DATE_ADDED + "DESC")
+            MediaStore.Video.Media.BUCKET_DISPLAY_NAME, MediaStore.Video.Media.DATA, MediaStore.Video.Media.DATE_ADDED, MediaStore.Video.Media.DURATION, MediaStore.Video.Media.BUCKET_ID)
+        val cursor = this.contentResolver.query(
+            MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+            projection,
+            null,
+            null,
+            MediaStore.Video.Media.DATE_ADDED + " DESC"
+        )
         if (cursor != null)
             if (cursor.moveToNext())
                 do {
@@ -86,22 +92,27 @@ class MainActivity : AppCompatActivity() {
                     try {
                         val file = File(pathC)
                         val artUri = Uri.fromFile(file)
-                        val video = Video(title = titleC,
-                            id = idC, folderName = folderC,
+                        val video = Video(
+                            title = titleC,
+                            id = idC,
+                            folderName = folderC,
                             duration = durationC,
                             size = sizeC,
                             artUri = artUri,
-                            path = pathC )
+                            path = pathC
+                        )
                         if (file.exists()) tempList.add(video)
 
-                        if (!tempFolderList.contains(folderC)){
+                        if (!tempFolderList.contains(folderC)) {
                             tempFolderList.add(folderC)
                             folderList.add(Folder(id = folderIdC, folderName = folderC))
                         }
-                    }catch (e:Exception){}
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
 
-                }while (cursor.moveToNext())
-                cursor?.close()
+                } while (cursor.moveToNext())
+        cursor?.close()
         return tempList
     }
 }
