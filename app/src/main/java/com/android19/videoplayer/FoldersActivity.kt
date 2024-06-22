@@ -32,7 +32,7 @@ class FoldersActivity : AppCompatActivity() {
         binding.videoRVFA.setHasFixedSize(true)
         binding.videoRVFA.setItemViewCacheSize(10)
         binding.videoRVFA.layoutManager = LinearLayoutManager(this@FoldersActivity)
-        binding.videoRVFA.adapter = VideoAdapter(this@FoldersActivity, currentFolderVideo )
+        binding.videoRVFA.adapter = VideoAdapter(this@FoldersActivity, currentFolderVideo, isFolder = true )
         binding.totalVideosFA.text = "total videos: ${currentFolderVideo.size}"
 
     }

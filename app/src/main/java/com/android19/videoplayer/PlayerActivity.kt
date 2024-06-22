@@ -12,8 +12,15 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.SimpleExoPlayer
 import com.android19.videoplayer.databinding.ActivityPlayerBinding
 
+@UnstableApi
 class PlayerActivity : AppCompatActivity() {
-    lateinit var binding: ActivityPlayerBinding
+    private lateinit var binding: ActivityPlayerBinding
+
+    companion object {
+        lateinit var player: SimpleExoPlayer
+        lateinit var playerList: ArrayList<Video>
+        var position: Int = -1
+    }
 
     @OptIn(UnstableApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,16 +28,51 @@ class PlayerActivity : AppCompatActivity() {
         binding = ActivityPlayerBinding.inflate(layoutInflater) // Initialize the binding
         this.enableEdgeToEdge()
         setContentView(binding.root)
-        val player = SimpleExoPlayer.Builder(this).build()
-        binding.playerView.player = player
-        val mediaItem = MediaItem.fromUri(MainActivity.videoList[0].artUri)
-        player.setMediaItem(mediaItem)
-        player.prepare()
-        player.play()
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v: View, insets: WindowInsetsCompat ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        initializeLayout()
+    }
+
+    private fun initializeLayout() {
+        when(intent.getStringExtra("class")) {
+            "AllVideos" -> {
+                playerList = ArrayList(MainActivity.videoList)
+            }
+            "FolderActivity" -> {
+                playerList = ArrayList(FoldersActivity.currentFolderVideo)
+            }
+        }
+        createPlayer()
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun createPlayer() {
+        player = SimpleExoPlayer.Builder(this).build()
+        binding.playerView.player = player
+        val mediaItem = MediaItem.fromUri(playerList[position].artUri)
+        player.setMediaItem(mediaItem)
+        player.prepare()
+        player.play()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (player == null) {
+            createPlayer()
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        player.release()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        player.release()
     }
 }
