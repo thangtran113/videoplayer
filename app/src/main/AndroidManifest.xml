@@ -16,6 +16,9 @@
         android:theme="@style/Theme.VideoPlayer"
         tools:ignore="AllowBackup">
         <activity
+            android:name=".PlayerActivity"
+            android:exported="false" />
+        <activity
             android:name=".FoldersActivity"
             android:screenOrientation="portrait"
             tools:ignore="DiscouragedApi,LockedOrientationActivity" />
