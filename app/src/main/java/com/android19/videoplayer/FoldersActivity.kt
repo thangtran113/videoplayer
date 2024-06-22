@@ -42,9 +42,9 @@ class FoldersActivity : AppCompatActivity() {
         return true
     }
     @SuppressLint("Range","InlineApi","Recycle")
-    private fun getAllVideos(folderId: String): ArrayList<Video>{
-        val  tempList = ArrayList<Video>()
-        val selection = MediaStore.Video.Media.BUCKET_ID + "like?"
+    private fun getAllVideos(folderId: String): ArrayList<Video> {
+        val tempList = ArrayList<Video>()
+        val selection = MediaStore.Video.Media.BUCKET_ID + " LIKE ?"
         val projection = arrayOf(
             MediaStore.Video.Media.TITLE,
             MediaStore.Video.Media.SIZE,
@@ -53,9 +53,15 @@ class FoldersActivity : AppCompatActivity() {
             MediaStore.Video.Media.DATA,
             MediaStore.Video.Media.DATE_ADDED,
             MediaStore.Video.Media.DURATION,
-            MediaStore.Video.Media.BUCKET_ID  )
-        val cursor = this.contentResolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-            projection, selection, arrayOf(folderId), MediaStore.Video.Media.DATE_ADDED + "DESC")
+            MediaStore.Video.Media.BUCKET_ID
+        )
+        val cursor = this.contentResolver.query(
+            MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+            projection,
+            selection,
+            arrayOf(folderId),
+            MediaStore.Video.Media.DATE_ADDED + " DESC"
+        )
         if (cursor != null)
             if (cursor.moveToNext())
                 do {
@@ -69,17 +75,22 @@ class FoldersActivity : AppCompatActivity() {
                     try {
                         val file = File(pathC)
                         val artUri = Uri.fromFile(file)
-                        val video = Video(title = titleC,
-                            id = idC, folderName = folderC,
+                        val video = Video(
+                            title = titleC,
+                            id = idC,
+                            folderName = folderC,
                             duration = durationC,
                             size = sizeC,
                             artUri = artUri,
-                            path = pathC )
+                            path = pathC
+                        )
                         if (file.exists()) tempList.add(video)
 
-                    }catch (e:Exception){}
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
 
-                }while (cursor.moveToNext())
+                } while (cursor.moveToNext())
         cursor?.close()
         return tempList
     }
