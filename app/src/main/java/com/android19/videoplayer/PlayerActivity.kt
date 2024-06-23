@@ -51,6 +51,8 @@ class PlayerActivity : AppCompatActivity() {
 
     @OptIn(UnstableApi::class)
     private fun createPlayer() {
+        binding.videoTilte.text = playerList[position].title
+        binding.videoTilte.isSelected = true
         player = SimpleExoPlayer.Builder(this).build()
         binding.playerView.player = player
         val mediaItem = MediaItem.fromUri(playerList[position].artUri)
