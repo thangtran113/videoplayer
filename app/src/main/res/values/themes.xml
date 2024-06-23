@@ -6,4 +6,27 @@
     </style>
 
     <style name="Theme.VideoPlayer" parent="Base.Theme.VideoPlayer" />
+    //custom theme
+    <style name="coolPinkNav" parent="Theme.MaterialComponents.Light">
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryVariant">@color/cool_pink</item>\
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorSecondary">@color/cool_pink</item>
+        <item name="colorSecondaryVariant">@color/cool_blue</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+    </style>
+
+    //for Player Activity
+    <style name="playerActivityTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryVariant">@color/cool_pink</item>\
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorSecondary">@color/cool_pink</item>
+        <item name="colorSecondaryVariant">@color/cool_blue</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+    </style>
 </resources>
