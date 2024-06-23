@@ -5,74 +5,76 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PlayerActivity">
-<androidx.media3.ui.PlayerView
+    tools:context=".PlayerActivity"
+    android:background="@color/black">
 
-    android:id="@+id/playerView"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:controller_layout_id="@layout/custom_control_view"
-    android:keepScreenOn="true"
-    />
+    <androidx.media3.ui.PlayerView
+        android:id="@+id/playerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:controller_layout_id="@layout/custom_control_view"
+        android:keepScreenOn="true"
+        />
 
     <LinearLayout
+        android:id="@+id/topController"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintEnd_toStartOf="parent"
+        android:background="#42000000"
         android:orientation="horizontal"
-        android:id="@+id/topController"
-        android:background="#42000000">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
             android:id="@+id/backButton"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/back_icon"
             android:backgroundTint="@android:color/transparent"
-            app:tint="@color/white"
             android:contentDescription="@string/back"
-            />
+            android:src="@drawable/back_icon"
+            app:tint="@color/white" />
+
         <TextView
+            android:id="@+id/videoTilte"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="@string/video_name"
+            android:ellipsize="marquee"
             android:gravity="center"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:singleLine="true"
+            android:text="@string/video_name"
             android:textColor="@color/white"
             android:textSize="16sp"
-            android:singleLine="true"
-            android:marqueeRepeatLimit="marquee_forever"
-            android:ellipsize="marquee"
-            android:id="@+id/videoTilte"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
+
         <ImageButton
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/menu_icon"
-            android:backgroundTint="@android:color/transparent"
-            app:tint="@color/white"
             android:layout_marginEnd="50dp"
+            android:backgroundTint="@android:color/transparent"
             android:contentDescription="@string/menu"
-            android:padding="10dp"/>
-
+            android:padding="10dp"
+            android:src="@drawable/menu_icon"
+            app:tint="@color/white" />
     </LinearLayout>
 
     <ImageButton
+        android:id="@+id/lockButton"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:backgroundTint="@android:color/transparent"
+        android:contentDescription="@string/lock_open"
         android:src="@drawable/open_lock_icon"
-        app:layout_constraintEnd_toEndOf="@+id/topController"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/white"
-        android:contentDescription="@string/lock_open"/>
+        app:tint="@color/white" />
+
     <ImageButton
         android:id="@+id/playButton"
         android:layout_width="100dp"
         android:layout_height="100dp"
-
         android:src="@drawable/play_icon"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -82,29 +84,28 @@
         android:focusable="true"
         android:background="?android:selectableItemBackground"
         app:tint="@color/white"
-        android:contentDescription="@string/lock_open"/>
+        android:contentDescription="@string/lock_open" />
 
     <!--Bottom Controller-->
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintEnd_toStartOf="parent"
         android:orientation="horizontal"
         android:id="@+id/bottomController"
         android:background="#42000000"
-        android:gravity="end|bottom">
+        android:gravity="end|bottom"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <ImageButton
+            android:id="@+id/repeatButton"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/repeat_icon"
+            android:src="@drawable/exo_icon_repeat_off"
             android:backgroundTint="@android:color/transparent"
             app:tint="@color/white"
-            android:contentDescription="@string/repeat"
-            />
+            android:contentDescription="@string/repeat" />
 
         <ImageButton
             android:id="@+id/previousButton"
@@ -113,8 +114,7 @@
             android:src="@drawable/previous_icon"
             android:backgroundTint="@android:color/transparent"
             app:tint="@color/white"
-
-            android:contentDescription="@string/previous"/>
+            android:contentDescription="@string/previous" />
 
         <ImageButton
             android:id="@+id/nextButton"
@@ -123,17 +123,17 @@
             android:src="@drawable/next_icon"
             android:backgroundTint="@android:color/transparent"
             app:tint="@color/white"
+            android:contentDescription="@string/next" />
 
-            android:contentDescription="@string/next"/>
         <ImageButton
+            android:id="@+id/fullscreenButton"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:src="@drawable/fullscreen_icon"
             android:backgroundTint="@android:color/transparent"
             app:tint="@color/white"
-
-            android:contentDescription="@string/fullscreen"/>
-
+            android:padding="5dp"
+            android:contentDescription="@string/fullscreen" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
