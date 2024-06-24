@@ -187,7 +187,7 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun playVideo() {
-        binding.playButton.setImageResource(R.drawable.pause_icon)
+        binding.playButton.setImageResource(R.drawable.pauseicon)
         player.play()
     }
 

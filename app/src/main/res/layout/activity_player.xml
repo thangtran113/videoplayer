@@ -84,7 +84,7 @@
         android:focusable="true"
         android:background="?android:selectableItemBackground"
         app:tint="@color/white"
-        android:contentDescription="@string/lock_open" />
+        android:contentDescription="@string/play" />
 
     <!--Bottom Controller-->
     <LinearLayout
@@ -105,7 +105,8 @@
             android:src="@drawable/exo_icon_repeat_off"
             android:backgroundTint="@android:color/transparent"
             app:tint="@color/white"
-            android:contentDescription="@string/repeat" />
+            android:contentDescription="@string/repeat"
+            tools:ignore="PrivateResource" />
 
         <ImageButton
             android:id="@+id/previousButton"

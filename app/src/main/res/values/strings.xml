@@ -18,4 +18,13 @@
     <string name="previous">Previous</string>
     <string name="next">Next</string>
     <string name="fullscreen">Fullsreen</string>
+    <string name="play">Play</string>
+
+    //Menu
+    <string name="audio_track">Audio Track</string>
+    <string name="subtitles">Subtitles</string>
+    <string name="booster">Booster</string>
+    <string name="speed">Speed</string>
+    <string name="sleep_timer">Sleep Timer</string>
+    <string name="pip_mode">PIP Mode</string>
 </resources>

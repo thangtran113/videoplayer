@@ -31,8 +31,9 @@
             android:layout_height="30dp"
             android:gravity="center_vertical"
             android:text="@string/video_name"
-            android:textColor="@color/black"
-            android:maxLines="1"/>
+            android:textColor="@color/white"
+            android:maxLines="1"
+            />
 
         <TextView
             android:id="@+id/folderName"
@@ -40,6 +41,7 @@
             android:layout_height="20dp"
             android:text="@string/folder_name"
             android:maxLines="1"
+            android:textColor="@color/white"
             android:gravity="center_vertical"/>
     </LinearLayout>
 
@@ -47,7 +49,7 @@
         android:id="@+id/duration"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:text="@string/duration"
         android:gravity="center"/>
 
