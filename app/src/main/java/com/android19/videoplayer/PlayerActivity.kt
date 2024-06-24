@@ -1,10 +1,12 @@
 package com.android19.videoplayer
 
 import android.annotation.SuppressLint
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.LayoutInflater
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
@@ -22,9 +24,9 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.SimpleExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
 import com.android19.videoplayer.databinding.ActivityPlayerBinding
+import com.android19.videoplayer.databinding.MoreFeaturesBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-import com.android19.videoplayer.databinding.MoreFeaturesBinding
 @UnstableApi
 class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
@@ -134,7 +136,7 @@ class PlayerActivity : AppCompatActivity() {
                 binding.playerView.hideController()
                 binding.playerView.useController = false
                 binding.lockButton.setImageResource(R.drawable.locked)
-        }
+            }
             else{
                 //hien
                 isLocked = false
@@ -142,6 +144,18 @@ class PlayerActivity : AppCompatActivity() {
                 binding.playerView.showController()
                 binding.lockButton.setImageResource(R.drawable.open_lock_icon)
             }
+        }
+        //da sua
+        binding.moreFeaturesBtn.setOnClickListener {
+            pauseVideo()
+            val customDialog =
+                LayoutInflater.from(this).inflate(R.layout.more_features, binding.root, false)
+            val bindingMF = MoreFeaturesBinding.bind(customDialog)
+            val dialog = MaterialAlertDialogBuilder(this).setView(customDialog)
+                .setOnCancelListener { playVideo() }
+                .setBackground(ColorDrawable(0x803700B3.toInt()))
+                .create()
+            dialog.show()
         }
     }
 
@@ -236,7 +250,7 @@ class PlayerActivity : AppCompatActivity() {
             Handler(Looper.getMainLooper()).postDelayed(runnable,300)
         }
         Handler(Looper.getMainLooper()).postDelayed(runnable,0)
-}
+    }
     private fun changeVisibility(visibility:Int){
         binding.topController.visibility = visibility
         binding.bottomController.visibility = visibility
