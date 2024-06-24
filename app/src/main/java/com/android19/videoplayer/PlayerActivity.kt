@@ -22,7 +22,9 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.SimpleExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
 import com.android19.videoplayer.databinding.ActivityPlayerBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
+import com.android19.videoplayer.databinding.MoreFeaturesBinding
 @UnstableApi
 class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
@@ -141,7 +143,6 @@ class PlayerActivity : AppCompatActivity() {
                 binding.lockButton.setImageResource(R.drawable.open_lock_icon)
             }
         }
-
     }
 
     @OptIn(UnstableApi::class)
