@@ -35,7 +35,7 @@ import java.util.Locale
 class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
     private lateinit var runnable: Runnable
-
+    private var isSubtitle:Boolean =true
     companion object {
         lateinit var player: SimpleExoPlayer
         lateinit var playerList: ArrayList<Video>
@@ -184,6 +184,26 @@ class PlayerActivity : AppCompatActivity() {
                     }
                     .create()
                     .show()
+            }
+            bindingMF.subtitlesBtn.setOnClickListener {
+                //
+                if (isSubtitle){
+                    trackSelector.parameters = DefaultTrackSelector.ParametersBuilder(this).setRendererDisabled(
+                        C.TRACK_TYPE_VIDEO,true
+                    ).build()
+                    Toast.makeText(this,"Sub off",Toast.LENGTH_SHORT).show()
+                    isSubtitle =false
+                }
+                else{
+                    trackSelector.parameters = DefaultTrackSelector.ParametersBuilder(this).setRendererDisabled(
+                        C.TRACK_TYPE_VIDEO,false
+                    ).build()
+                    Toast.makeText(this,"Sub on",Toast.LENGTH_SHORT).show()
+                    isSubtitle =true
+
+                }
+                dialog.dismiss()
+                playVideo()
             }
         }
     }
