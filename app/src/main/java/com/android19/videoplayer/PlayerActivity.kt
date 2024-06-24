@@ -1,10 +1,12 @@
 package com.android19.videoplayer
 
 import android.annotation.SuppressLint
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.LayoutInflater
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
@@ -22,7 +24,9 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.SimpleExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
 import com.android19.videoplayer.databinding.ActivityPlayerBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
+import com.android19.videoplayer.databinding.MoreFeaturesBinding
 @UnstableApi
 class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
@@ -141,7 +145,7 @@ class PlayerActivity : AppCompatActivity() {
                 binding.lockButton.setImageResource(R.drawable.open_lock_icon)
             }
         }
-        //chua sua
+        //da sua
         binding.moreFeaturesBtn.setOnClickListener {
             pauseVideo()
             val customDialog =
