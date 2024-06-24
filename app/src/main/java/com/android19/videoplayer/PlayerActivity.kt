@@ -141,7 +141,18 @@ class PlayerActivity : AppCompatActivity() {
                 binding.lockButton.setImageResource(R.drawable.open_lock_icon)
             }
         }
-
+        //chua sua
+        binding.setOnClickListener {
+            pauseVideo()
+            val customDialog =
+                LayoutInflater.from(this).inflate(R.layout.more_features, binding.root, false)
+            val bindingMF = MoreFeaturesBinding.bind(customDialog)
+            val dialog = MaterialAlertDialogBuilder(this).setView(customDialog)
+                .setOnCancelListener { playVideo() }
+                .setBackground(ColorDrawable(0x803700B3.toInt()))
+                .create()
+            dialog.show()
+        }
     }
 
     @OptIn(UnstableApi::class)
@@ -244,6 +255,7 @@ class PlayerActivity : AppCompatActivity() {
         if(isLocked) binding.lockButton.visibility = View.VISIBLE
         else    binding.lockButton.visibility = visibility
     }
+
     override fun onDestroy() {
         super.onDestroy()
         if (isPlayerInitialized) {
