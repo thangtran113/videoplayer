@@ -29,6 +29,8 @@ import androidx.media3.ui.AspectRatioFrameLayout
 import com.android19.videoplayer.databinding.ActivityPlayerBinding
 
 import com.android19.videoplayer.databinding.BoosterBinding
+
+import com.android19.videoplayer.databinding.SpeedDialogBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 import com.android19.videoplayer.databinding.MoreFeaturesBinding
@@ -50,6 +52,7 @@ class PlayerActivity : AppCompatActivity() {
 
         private lateinit var trackSelector: DefaultTrackSelector
         private lateinit var loudnessEnhancer: LoudnessEnhancer
+        private var speed: Float = 1.0f
         //
     }
 
@@ -225,20 +228,37 @@ class PlayerActivity : AppCompatActivity() {
                 val bindingB = BoosterBinding.bind(customDialogB)
                 val dialogB = MaterialAlertDialogBuilder(this).setView(customDialogB)
                     .setOnCancelListener { playVideo() }
-                    .setPositiveButton("OK"){self, _ ->
-                        loudnessEnhancer.setTargetGain(bindingB.verticalBar.progress*100)
-
+                    .setPositiveButton("OK") { self, _ ->
+                        loudnessEnhancer.setTargetGain(bindingB.verticalBar.progress * 100)
+                        playVideo()
                         self.dismiss()
                     }
                     .setBackground(ColorDrawable(0x803700B3.toInt()))
                     .create()
-                bindingB.verticalBar.progress =loudnessEnhancer.targetGain.toInt()/100
-                bindingB.progressText.text ="AudioBoost\n\n${loudnessEnhancer.targetGain.toInt()/10}"
-                bindingB.verticalBar.setOnProgressChangeListener {
-                    bindingB.progressText.text ="AudioBoost\n\n${it*10}"
-                }
                 dialogB.show()
-                playVideo()
+
+                bindingB.verticalBar.progress = loudnessEnhancer.targetGain.toInt() / 100
+                bindingB.progressText.text =
+                    "AudioBoost\n\n${loudnessEnhancer.targetGain.toInt() / 10}"
+                bindingB.verticalBar.setOnProgressChangeListener {
+                    bindingB.progressText.text = "AudioBoost\n\n${it * 10}"
+                }
+            }
+            bindingMF.speedBtn.setOnClickListener {
+                dialog.dismiss()
+                val customDialogS =
+                    LayoutInflater.from(this).inflate(R.layout.speed_dialog, binding.root, false)
+                val bindingS = SpeedDialogBinding.bind(customDialogS)
+                val dialogS = MaterialAlertDialogBuilder(this).setView(customDialogS)
+                    .setOnCancelListener { playVideo() }
+                    .setPositiveButton("OK") { self, _ ->)
+                        playVideo()
+                        self.dismiss()
+                    }
+                    .setBackground(ColorDrawable(0x803700B3.toInt()))
+                    .create()
+                dialogS.show()
+
             }
         }
     }

@@ -59,12 +59,12 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp" />
 
-        <TextView
+        <!--TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:text="@string/apply_to_all"
-            android:textColor="@color/white" />
+            android:textColor="@color/white" /-->
 
     </LinearLayout>
 
