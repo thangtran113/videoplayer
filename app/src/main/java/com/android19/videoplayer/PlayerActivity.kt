@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
@@ -22,15 +23,20 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.SimpleExoPlayer
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.AspectRatioFrameLayout
 import com.android19.videoplayer.databinding.ActivityPlayerBinding
 import com.android19.videoplayer.databinding.MoreFeaturesBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
+import com.android19.videoplayer.databinding.MoreFeaturesBinding
+import java.util.Locale
+
 @UnstableApi
 class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
     private lateinit var runnable: Runnable
+
     companion object {
         lateinit var player: SimpleExoPlayer
         lateinit var playerList: ArrayList<Video>
@@ -39,7 +45,8 @@ class PlayerActivity : AppCompatActivity() {
         private var repeat : Boolean = false
         private var isFullScreen: Boolean = false
         private var isLocked: Boolean = false
-
+        lateinit var trackSelector: DefaultTrackSelector
+        //
     }
 
     @OptIn(UnstableApi::class)
@@ -156,6 +163,29 @@ class PlayerActivity : AppCompatActivity() {
                 .setBackground(ColorDrawable(0x803700B3.toInt()))
                 .create()
             dialog.show()
+
+            bindingMF.audioTrack.setOnClickListener{
+                dialog.dismiss()
+                playVideo()
+                val audioTrack = ArrayList<String>()
+                for(i in 0 until player.currentTrackGroups.length){
+                    if(player.currentTrackGroups.get(i).getFormat(0).selectionFlags == C.SELECTION_FLAG_DEFAULT){
+                    audioTrack.add(Locale(player.currentTrackGroups.get(i).getFormat(0).language.toString()).displayLanguage)
+                    }
+                }
+
+                val tempTracks = audioTrack.toArray(arrayOfNulls<CharSequence>(audioTrack.size))
+                MaterialAlertDialogBuilder(this,R.style.alertDialog)
+                    .setTitle("Select language")
+                    .setOnCancelListener { playVideo() }
+                    .setBackground(ColorDrawable(0x803700B3.toInt()))
+                    .setItems(tempTracks) {_, position ->
+                        Toast.makeText(this,audioTrack[position]+"Selected",Toast.LENGTH_SHORT).show()
+                        trackSelector.setParameters(trackSelector.buildUponParameters().setPreferredAudioLanguage(audioTrack[position]))
+                    }
+                    .create()
+                    .show()
+            }
         }
     }
 
@@ -166,10 +196,12 @@ class PlayerActivity : AppCompatActivity() {
         }
         catch(e:Exception){}
 
+        //
+        trackSelector = DefaultTrackSelector(this)
 
         binding.videoTilte.text = playerList[position].title
         binding.videoTilte.isSelected = true
-        player = SimpleExoPlayer.Builder(this).build()
+        player = SimpleExoPlayer.Builder(this).setTrackSelector(trackSelector).build()
         binding.playerView.player = player
         val mediaItem = MediaItem.fromUri(playerList[position].artUri)
         player.setMediaItem(mediaItem)
