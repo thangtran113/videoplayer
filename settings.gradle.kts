@@ -17,8 +17,17 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
     }
+
+    repositories {
+        google()
+        mavenCentral()
+        maven { url = uri("https://jitpack.io") }
+    }
 }
+
+
+
+
 
 rootProject.name = "VideoPlayer"
 include(":app")
- 

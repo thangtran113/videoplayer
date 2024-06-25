@@ -185,22 +185,20 @@ class PlayerActivity : AppCompatActivity() {
                     .create()
                     .show()
             }
-            bindingMF.subtitlesBtn.setOnClickListener {
-                //
-                if (isSubtitle){
+            bindingMF.subtitlesBtn.setOnClickListener{
+                if(isSubtitle){
                     trackSelector.parameters = DefaultTrackSelector.ParametersBuilder(this).setRendererDisabled(
                         C.TRACK_TYPE_VIDEO,true
                     ).build()
-                    Toast.makeText(this,"Sub off",Toast.LENGTH_SHORT).show()
-                    isSubtitle =false
+                    Toast.makeText(this,"Subtitles OFF",Toast.LENGTH_SHORT).show()
+                    isSubtitle = false
                 }
                 else{
                     trackSelector.parameters = DefaultTrackSelector.ParametersBuilder(this).setRendererDisabled(
                         C.TRACK_TYPE_VIDEO,false
                     ).build()
-                    Toast.makeText(this,"Sub on",Toast.LENGTH_SHORT).show()
-                    isSubtitle =true
-
+                    Toast.makeText(this,"Subtitles ON",Toast.LENGTH_SHORT).show()
+                    isSubtitle = true
                 }
                 dialog.dismiss()
                 playVideo()
