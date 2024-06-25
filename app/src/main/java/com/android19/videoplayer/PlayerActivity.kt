@@ -60,7 +60,7 @@ class PlayerActivity : AppCompatActivity() {
         private var repeat : Boolean = false
         private var isFullScreen: Boolean = false
         private var isLocked: Boolean = false
-
+        var pipStatus: Int = 0
         private lateinit var trackSelector: DefaultTrackSelector
         private lateinit var loudnessEnhancer: LoudnessEnhancer
         private var speed: Float = 1.0f
@@ -339,6 +339,7 @@ class PlayerActivity : AppCompatActivity() {
                         dialog.dismiss()
                         binding.playerView.hideController()
                         playVideo()
+                        pipStatus =0
                     } else {
                         val intent = Intent(
                             "android.settings.PICTURE_IN_PICTURE_SETTINGS",
@@ -472,6 +473,24 @@ class PlayerActivity : AppCompatActivity() {
 
         if(isLocked) binding.lockButton.visibility = View.VISIBLE
         else    binding.lockButton.visibility = visibility
+    }
+
+    override fun onPictureInPictureModeChanged(
+        isInPictureInPictureMode: Boolean
+    ) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode)
+        if (pipStatus != 0) {
+            finish()
+            val intent = Intent(this, PlayerActivity::class.java)
+            when (pipStatus) {
+                1 -> intent.putExtra("class", "FolderActivity")
+                2 -> intent.putExtra("class", "SearchedVideos")
+                3 -> intent.putExtra("class", "AllVideos")
+            }
+            startActivity(intent)
+        }
+        if (!isInPictureInPictureMode) pauseVideo()
+
     }
     override fun onDestroy() {
         super.onDestroy()
