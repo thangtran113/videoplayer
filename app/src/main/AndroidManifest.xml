@@ -17,8 +17,11 @@
         tools:ignore="AllowBackup">
         <activity
             android:name=".PlayerActivity"
-
-            android:configChanges="uiMode|orientation|screenSize|screenLayout"/>
+            android:resizeableActivity="true"
+            android:supportsPictureInPicture="true"
+            android:launchMode="singleTask"
+            android:configChanges="uiMode|orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
+            tools:targetApi="n"/>
         <activity
             android:name=".FoldersActivity"
             android:screenOrientation="portrait"

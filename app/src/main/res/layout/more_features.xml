@@ -22,7 +22,7 @@
             android:text="@string/audio_track"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            app:icon="@drawable/audio_track_icon"
+            app:icon="@drawable/audiotrack_icon"
             app:iconGravity="top"
             app:iconTint="@color/white" />
 
@@ -54,7 +54,7 @@
             android:text="@string/booster"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            app:icon="@drawable/booster_icon"
+            app:icon="@drawable/booster"
             app:iconGravity="top"
             app:iconTint="@color/white" />
 

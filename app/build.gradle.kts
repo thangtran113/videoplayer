@@ -2,7 +2,6 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
 }
-
 android {
     namespace = "com.android19.videoplayer"
     compileSdk = 34
@@ -48,5 +47,5 @@ dependencies {
     implementation("androidx.media3:media3-exoplayer:1.3.1")
     implementation("androidx.media3:media3-exoplayer-dash:1.3.1")
     implementation("androidx.media3:media3-ui:1.3.1")
-
+    implementation ("com.github.lukelorusso:VerticalSeekBar:1.2.7")
 }
