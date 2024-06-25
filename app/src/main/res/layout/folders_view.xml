@@ -22,7 +22,7 @@
         android:id="@+id/folderNameFV"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:text="@string/folder_name"
         android:textSize="18sp"
         android:gravity="center_vertical"

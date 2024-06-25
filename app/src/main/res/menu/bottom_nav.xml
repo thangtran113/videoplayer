@@ -7,5 +7,9 @@
         android:title="All Folders"
         android:icon="@drawable/folders_icon"
         />
+    <item android:id="@+id/more"
+        android:title="More"
+        android:icon="@drawable/more"
+        />
 
 </menu>

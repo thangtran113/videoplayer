@@ -28,17 +28,14 @@ import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.SimpleExoPlayer
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.AspectRatioFrameLayout
 import com.android19.videoplayer.databinding.ActivityPlayerBinding
-
 import com.android19.videoplayer.databinding.BoosterBinding
-
+import com.android19.videoplayer.databinding.MoreFeaturesBinding
 import com.android19.videoplayer.databinding.SpeedDialogBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-
-import com.android19.videoplayer.databinding.MoreFeaturesBinding
 import java.text.DecimalFormat
 import java.util.Locale
 import java.util.Timer
@@ -50,10 +47,11 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
     private lateinit var runnable: Runnable
     private var isSubtitle:Boolean =true
+    private var moreTime: Int = 0
     companion object {
         private var timer: Timer? = null
 
-        lateinit var player: SimpleExoPlayer
+        lateinit var player: ExoPlayer
         lateinit var playerList: ArrayList<Video>
         var position: Int = -1
         var isPlayerInitialized = false
@@ -72,29 +70,40 @@ class PlayerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            window.attributes.layoutInDisplayCutoutMode=WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
         }
         binding = ActivityPlayerBinding.inflate(layoutInflater)
-
-
         this.enableEdgeToEdge()
-        //for immersive mode
         setTheme(R.style.playerActivityTheme)
         setContentView(binding.root)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        WindowInsetsControllerCompat(window, binding.root).let {
-                controller -> controller.hide(WindowInsetsCompat.Type.systemBars())
+        WindowInsetsControllerCompat(window, binding.root).let { controller ->
+            controller.hide(WindowInsetsCompat.Type.systemBars())
             controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
-
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v: View, insets: WindowInsetsCompat ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
         initializeLayout()
         initializeBinding()
+        binding.forwardFrameBtn.setOnClickListener(DoubleClickListener(callback = object : DoubleClickListener.Callback {
+            override fun doubleClicked() {
+                binding.playerView.showController()
+                binding.forwardButton.visibility = View.VISIBLE
+                player.seekTo(player.currentPosition + 10000)
+                moreTime = 0
+            }
+        }))
+        binding.backwardFrameBtn.setOnClickListener(DoubleClickListener(callback = object : DoubleClickListener.Callback {
+            override fun doubleClicked() {
+                binding.playerView.showController()
+                binding.backwardButton.visibility = View.VISIBLE
+                player.seekTo(player.currentPosition - 10000)
+                moreTime = 0
+            }
+        }))
     }
 
     @SuppressLint("PrivateResource")
@@ -361,41 +370,50 @@ class PlayerActivity : AppCompatActivity() {
     private fun createPlayer() {
         try {
             player.release()
-        }
-        catch(e:Exception){}
-        speed =1.0f
-        //
+        } catch (e: Exception) { }
+        speed = 1.0f
         trackSelector = DefaultTrackSelector(this)
-
         binding.videoTilte.text = playerList[position].title
         binding.videoTilte.isSelected = true
-        player = SimpleExoPlayer.Builder(this).setTrackSelector(trackSelector).build()
+        player = ExoPlayer.Builder(this).setTrackSelector(trackSelector).build()
         binding.playerView.player = player
         val mediaItem = MediaItem.fromUri(playerList[position].artUri)
         player.setMediaItem(mediaItem)
         player.prepare()
         player.play()
         isPlayerInitialized = true
-        player.addListener(object : Player.Listener{
+        player.addListener(object : Player.Listener {
             override fun onPlaybackStateChanged(playbackState: Int) {
                 super.onPlaybackStateChanged(playbackState)
-                if(playbackState == Player.STATE_ENDED) nextPreviousVideo()
+                if (playbackState == Player.STATE_ENDED) nextPreviousVideo()
+            }
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                super.onIsPlayingChanged(isPlaying)
+                setPlayButtonImage(isPlaying)
             }
         })
         playInFullScreen(enable = isFullScreen)
         setVisibility()
-
         loudnessEnhancer = LoudnessEnhancer(player.audioSessionId)
         loudnessEnhancer.enabled = true
     }
+    private fun setPlayButtonImage(isPlaying: Boolean) {
+        if (isPlaying) {
+            binding.playButton.setImageResource(R.drawable.pauseicon)
+        } else {
+            binding.playButton.setImageResource(R.drawable.play_icon)
+        }
+    }
+
 
     override fun onStart() {
         super.onStart()
         if (!isPlayerInitialized) {
             createPlayer()
+        } else {
+            setPlayButtonImage(player.isPlaying)
         }
     }
-
     override fun onStop() {
         super.onStop()
         if (isPlayerInitialized) {
@@ -473,6 +491,16 @@ class PlayerActivity : AppCompatActivity() {
 
         if(isLocked) binding.lockButton.visibility = View.VISIBLE
         else    binding.lockButton.visibility = visibility
+        if(moreTime ==2){
+            binding.backwardButton.visibility = View.GONE
+            binding.forwardButton.visibility = View.GONE
+        }else ++moreTime
+        //khoá màn hình - ẩn
+//        binding.backwardFrameBtn.visibility = visibility
+//        binding.forwardFrameBtn.visibility = visibility
+
+
+
     }
 
     override fun onPictureInPictureModeChanged(

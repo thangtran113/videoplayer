@@ -2,24 +2,22 @@ package com.android19.videoplayer
 
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.view.MenuItem
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import com.android19.videoplayer.databinding.ActivityMainBinding
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
-
+    lateinit var toggle: ActionBarDrawerToggle
     companion object{
         lateinit var videoList: ArrayList<Video>
         lateinit var folderList: ArrayList<Folder>
@@ -28,11 +26,29 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        //Nav Drawer
+        toggle = ActionBarDrawerToggle(this, binding.main, R.string.open, R.string.close)
+        binding.main.addDrawerListener(toggle)
+        toggle.syncState()
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        // Xử lý sự kiện khi mục trong header NavigationView được nhấn
+        binding.headerNavView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.open_drawer -> {
+                    binding.main.openDrawer(binding.navView)
+                    true
+                }
+                else -> false
+            }
+        }
+
         if (requestRuntimePermission()){
             folderList = ArrayList()
             videoList = getAllVideos()
             setFragment(VideosFragment())
         }
+
         binding.bottomNav.setOnItemSelectedListener {
             when(it.itemId){
                 R.id.videoView -> setFragment(VideosFragment())
@@ -40,16 +56,17 @@ class MainActivity : AppCompatActivity() {
             }
             return@setOnItemSelectedListener true
         }
-
     }
-    private fun setFragment(fragment:Fragment){
+
+    private fun setFragment(fragment: Fragment) {
         val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.fragmentFL,fragment)
+        transaction.replace(R.id.fragmentFL, fragment)
         transaction.disallowAddToBackStack()
         transaction.commit()
     }
-    private fun requestRuntimePermission():Boolean{
-        if (ActivityCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+
+    private fun requestRuntimePermission(): Boolean {
+        if (ActivityCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(WRITE_EXTERNAL_STORAGE), 13)
             return false
         }
@@ -60,21 +77,36 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 13)
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Permission Grandted", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show()
                 folderList = ArrayList()
                 videoList = getAllVideos()
                 setFragment(VideosFragment())
+            } else {
+                ActivityCompat.requestPermissions(this, arrayOf(WRITE_EXTERNAL_STORAGE), 13)
             }
-            else
-                ActivityCompat.requestPermissions(this, arrayOf(WRITE_EXTERNAL_STORAGE),13)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (toggle.onOptionsItemSelected(item)) {
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     @SuppressLint("Range", "SuspiciousIndentation")
-    private fun getAllVideos(): ArrayList<Video>{
+    private fun getAllVideos(): ArrayList<Video> {
         val tempList = ArrayList<Video>()
         val tempFolderList = ArrayList<String>()
-        val projection = arrayOf(MediaStore.Video.Media.TITLE, MediaStore.Video.Media.SIZE, MediaStore.Video.Media._ID,
-            MediaStore.Video.Media.BUCKET_DISPLAY_NAME, MediaStore.Video.Media.DATA, MediaStore.Video.Media.DATE_ADDED, MediaStore.Video.Media.DURATION, MediaStore.Video.Media.BUCKET_ID)
+        val projection = arrayOf(
+            MediaStore.Video.Media.TITLE,
+            MediaStore.Video.Media.SIZE,
+            MediaStore.Video.Media._ID,
+            MediaStore.Video.Media.BUCKET_DISPLAY_NAME,
+            MediaStore.Video.Media.DATA,
+            MediaStore.Video.Media.DATE_ADDED,
+            MediaStore.Video.Media.DURATION,
+            MediaStore.Video.Media.BUCKET_ID
+        )
         val cursor = this.contentResolver.query(
             MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
             projection,

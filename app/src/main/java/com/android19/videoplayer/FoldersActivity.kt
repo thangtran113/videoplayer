@@ -5,13 +5,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.MenuItem
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.android19.videoplayer.databinding.ActivityFoldersBinding
-import com.android19.videoplayer.databinding.ActivityMainBinding
 import java.io.File
 
 class FoldersActivity : AppCompatActivity() {
@@ -33,7 +29,7 @@ class FoldersActivity : AppCompatActivity() {
         binding.videoRVFA.setItemViewCacheSize(10)
         binding.videoRVFA.layoutManager = LinearLayoutManager(this@FoldersActivity)
         binding.videoRVFA.adapter = VideoAdapter(this@FoldersActivity, currentFolderVideo, isFolder = true )
-        binding.totalVideosFA.text = "total videos: ${currentFolderVideo.size}"
+        binding.totalVideosFA.text = "Total videos: ${currentFolderVideo.size}"
 
     }
 
