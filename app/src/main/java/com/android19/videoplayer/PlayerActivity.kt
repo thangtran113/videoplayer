@@ -2,6 +2,7 @@ package com.android19.videoplayer
 
 import android.annotation.SuppressLint
 import android.graphics.drawable.ColorDrawable
+import android.media.audiofx.LoudnessEnhancer
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -46,7 +47,9 @@ class PlayerActivity : AppCompatActivity() {
         private var repeat : Boolean = false
         private var isFullScreen: Boolean = false
         private var isLocked: Boolean = false
-        lateinit var trackSelector: DefaultTrackSelector
+
+        private lateinit var trackSelector: DefaultTrackSelector
+        private lateinit var loudnessEnhancer: LoudnessEnhancer
         //
     }
 
@@ -222,8 +225,18 @@ class PlayerActivity : AppCompatActivity() {
                 val bindingB = BoosterBinding.bind(customDialogB)
                 val dialogB = MaterialAlertDialogBuilder(this).setView(customDialogB)
                     .setOnCancelListener { playVideo() }
+                    .setPositiveButton("OK"){self, _ ->
+                        loudnessEnhancer.setTargetGain(bindingB.verticalBar.progress*100)
+
+                        self.dismiss()
+                    }
                     .setBackground(ColorDrawable(0x803700B3.toInt()))
                     .create()
+                bindingB.verticalBar.progress =loudnessEnhancer.targetGain.toInt()/100
+                bindingB.progressText.text ="AudioBoost\n\n${loudnessEnhancer.targetGain.toInt()/10}"
+                bindingB.verticalBar.setOnProgressChangeListener {
+                    bindingB.progressText.text ="AudioBoost\n\n${it*10}"
+                }
                 dialogB.show()
                 playVideo()
             }
@@ -256,6 +269,9 @@ class PlayerActivity : AppCompatActivity() {
         })
         playInFullScreen(enable = isFullScreen)
         setVisibility()
+
+        loudnessEnhancer = LoudnessEnhancer(player.audioSessionId)
+        loudnessEnhancer.enabled = true
     }
 
     override fun onStart() {
