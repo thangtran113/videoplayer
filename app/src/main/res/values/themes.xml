@@ -13,6 +13,7 @@
     <style name="Theme.VideoPlayer" parent="Base.Theme.VideoPlayer" />
     //custom theme
     <style name="coolPinkNav" parent="Theme.MaterialComponents.Light">
+
         <item name="colorPrimary">@color/white</item>
         <item name="colorPrimaryVariant">@color/cool_pink</item>\
         <item name="colorOnPrimary">@color/black</item>

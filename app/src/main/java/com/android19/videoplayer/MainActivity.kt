@@ -2,23 +2,24 @@ package com.android19.videoplayer
 
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.widget.Button
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import com.android19.videoplayer.databinding.ActivityMainBinding
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
+    private var isBackgroundBlue = true
+
 
     companion object{
         lateinit var videoList: ArrayList<Video>
@@ -26,8 +27,18 @@ class MainActivity : AppCompatActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+
+        findViewById<Button>(R.id.btnChangeBackground).setOnClickListener {
+            changeBackground()
+        }
+
+
+
         if (requestRuntimePermission()){
             folderList = ArrayList()
             videoList = getAllVideos()
@@ -42,6 +53,19 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+
+    private fun changeBackground() {
+        val mainLayout = findViewById<ConstraintLayout>(R.id.main)
+
+        if (isBackgroundBlue) {
+            mainLayout.setBackgroundColor(Color.parseColor("#C0C0C0")) // Sliver
+        } else {
+            mainLayout.setBackgroundColor(Color.parseColor("#808080")) // Gray
+        }
+
+        isBackgroundBlue = !isBackgroundBlue
+    }
+
     private fun setFragment(fragment:Fragment){
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fragmentFL,fragment)
