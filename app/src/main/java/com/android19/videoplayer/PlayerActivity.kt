@@ -26,6 +26,8 @@ import androidx.media3.exoplayer.SimpleExoPlayer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.AspectRatioFrameLayout
 import com.android19.videoplayer.databinding.ActivityPlayerBinding
+
+import com.android19.videoplayer.databinding.BoosterBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 import com.android19.videoplayer.databinding.MoreFeaturesBinding
@@ -109,10 +111,10 @@ class PlayerActivity : AppCompatActivity() {
                 playVideo()
             }
         }
-        binding.nextButton.setOnClickListener{
+        binding.nextButton.setOnClickListener {
             nextPreviousVideo()
         }
-        binding.previousButton.setOnClickListener{
+        binding.previousButton.setOnClickListener {
             nextPreviousVideo(isNext = false)
         }
         binding.repeatButton.setOnClickListener {
@@ -126,24 +128,23 @@ class PlayerActivity : AppCompatActivity() {
                 binding.repeatButton.setImageResource(androidx.media3.ui.R.drawable.exo_legacy_controls_repeat_all)
             }
         }
-        binding.fullscreenButton.setOnClickListener{
-            if(isFullScreen){
+        binding.fullscreenButton.setOnClickListener {
+            if (isFullScreen) {
                 isFullScreen = false
                 playInFullScreen(enable = false)
-            }else{
+            } else {
                 isFullScreen = true
                 playInFullScreen(enable = true)
             }
         }
-        binding.lockButton.setOnClickListener{
-            if(!isLocked){
+        binding.lockButton.setOnClickListener {
+            if (!isLocked) {
                 //ẩn
                 isLocked = true
                 binding.playerView.hideController()
                 binding.playerView.useController = false
                 binding.lockButton.setImageResource(R.drawable.locked)
-            }
-            else{
+            } else {
                 //hien
                 isLocked = false
                 binding.playerView.useController = true
@@ -163,49 +164,71 @@ class PlayerActivity : AppCompatActivity() {
                 .create()
             dialog.show()
 
-            bindingMF.audioTrack.setOnClickListener{
+            bindingMF.audioTrack.setOnClickListener {
                 dialog.dismiss()
                 playVideo()
                 val audioTrack = ArrayList<String>()
-                for(i in 0 until player.currentTrackGroups.length){
-                    if(player.currentTrackGroups.get(i).getFormat(0).selectionFlags == C.SELECTION_FLAG_DEFAULT){
-                        audioTrack.add(Locale(player.currentTrackGroups.get(i).getFormat(0).language.toString()).displayLanguage)
+                for (i in 0 until player.currentTrackGroups.length) {
+                    if (player.currentTrackGroups.get(i)
+                            .getFormat(0).selectionFlags == C.SELECTION_FLAG_DEFAULT
+                    ) {
+                        audioTrack.add(
+                            Locale(
+                                player.currentTrackGroups.get(i).getFormat(0).language.toString()
+                            ).displayLanguage
+                        )
                     }
                 }
 
                 val tempTracks = audioTrack.toArray(arrayOfNulls<CharSequence>(audioTrack.size))
-                MaterialAlertDialogBuilder(this,R.style.alertDialog)
+                MaterialAlertDialogBuilder(this, R.style.alertDialog)
                     .setTitle("Select language")
                     .setOnCancelListener { playVideo() }
                     .setBackground(ColorDrawable(0x803700B3.toInt()))
-                    .setItems(tempTracks) {_, position ->
-                        Toast.makeText(this,audioTrack[position]+"Selected",Toast.LENGTH_SHORT).show()
-                        trackSelector.setParameters(trackSelector.buildUponParameters().setPreferredAudioLanguage(audioTrack[position]))
+                    .setItems(tempTracks) { _, position ->
+                        Toast.makeText(this, audioTrack[position] + "Selected", Toast.LENGTH_SHORT)
+                            .show()
+                        trackSelector.setParameters(
+                            trackSelector.buildUponParameters()
+                                .setPreferredAudioLanguage(audioTrack[position])
+                        )
                     }
                     .create()
                     .show()
             }
-            bindingMF.subtitlesBtn.setOnClickListener{
-                if(isSubtitle){
-                    trackSelector.parameters = DefaultTrackSelector.ParametersBuilder(this).setRendererDisabled(
-                        C.TRACK_TYPE_VIDEO,true
-                    ).build()
-                    Toast.makeText(this,"Subtitles OFF",Toast.LENGTH_SHORT).show()
+            bindingMF.subtitlesBtn.setOnClickListener {
+                if (isSubtitle) {
+                    trackSelector.parameters =
+                        DefaultTrackSelector.ParametersBuilder(this).setRendererDisabled(
+                            C.TRACK_TYPE_VIDEO, true
+                        ).build()
+                    Toast.makeText(this, "Subtitles OFF", Toast.LENGTH_SHORT).show()
                     isSubtitle = false
-                }
-                else{
-                    trackSelector.parameters = DefaultTrackSelector.ParametersBuilder(this).setRendererDisabled(
-                        C.TRACK_TYPE_VIDEO,false
-                    ).build()
-                    Toast.makeText(this,"Subtitles ON",Toast.LENGTH_SHORT).show()
+                } else {
+                    trackSelector.parameters =
+                        DefaultTrackSelector.ParametersBuilder(this).setRendererDisabled(
+                            C.TRACK_TYPE_VIDEO, false
+                        ).build()
+                    Toast.makeText(this, "Subtitles ON", Toast.LENGTH_SHORT).show()
                     isSubtitle = true
                 }
                 dialog.dismiss()
                 playVideo()
             }
+            bindingMF.audioBooster.setOnClickListener {
+                dialog.dismiss()
+                val customDialogB =
+                    LayoutInflater.from(this).inflate(R.layout.booster, binding.root, false)
+                val bindingB = BoosterBinding.bind(customDialogB)
+                val dialogB = MaterialAlertDialogBuilder(this).setView(customDialogB)
+                    .setOnCancelListener { playVideo() }
+                    .setBackground(ColorDrawable(0x803700B3.toInt()))
+                    .create()
+                dialogB.show()
+                playVideo()
+            }
         }
     }
-
     @OptIn(UnstableApi::class)
     private fun createPlayer() {
         try {
