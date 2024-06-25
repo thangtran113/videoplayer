@@ -1,13 +1,16 @@
 package com.android19.videoplayer
 
 import android.annotation.SuppressLint
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.LayoutInflater
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
@@ -20,13 +23,19 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.SimpleExoPlayer
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.AspectRatioFrameLayout
 import com.android19.videoplayer.databinding.ActivityPlayerBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+
+import com.android19.videoplayer.databinding.MoreFeaturesBinding
+import java.util.Locale
 
 @UnstableApi
 class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
     private lateinit var runnable: Runnable
+    private var isSubtitle:Boolean =true
     companion object {
         lateinit var player: SimpleExoPlayer
         lateinit var playerList: ArrayList<Video>
@@ -35,7 +44,8 @@ class PlayerActivity : AppCompatActivity() {
         private var repeat : Boolean = false
         private var isFullScreen: Boolean = false
         private var isLocked: Boolean = false
-
+        lateinit var trackSelector: DefaultTrackSelector
+        //
     }
 
     @OptIn(UnstableApi::class)
@@ -132,7 +142,7 @@ class PlayerActivity : AppCompatActivity() {
                 binding.playerView.hideController()
                 binding.playerView.useController = false
                 binding.lockButton.setImageResource(R.drawable.locked)
-        }
+            }
             else{
                 //hien
                 isLocked = false
@@ -141,8 +151,8 @@ class PlayerActivity : AppCompatActivity() {
                 binding.lockButton.setImageResource(R.drawable.open_lock_icon)
             }
         }
-        //chua sua
-        binding.setOnClickListener {
+        //da sua
+        binding.moreFeaturesBtn.setOnClickListener {
             pauseVideo()
             val customDialog =
                 LayoutInflater.from(this).inflate(R.layout.more_features, binding.root, false)
@@ -152,6 +162,49 @@ class PlayerActivity : AppCompatActivity() {
                 .setBackground(ColorDrawable(0x803700B3.toInt()))
                 .create()
             dialog.show()
+
+            bindingMF.audioTrack.setOnClickListener{
+                dialog.dismiss()
+                playVideo()
+                val audioTrack = ArrayList<String>()
+                for(i in 0 until player.currentTrackGroups.length){
+                    if(player.currentTrackGroups.get(i).getFormat(0).selectionFlags == C.SELECTION_FLAG_DEFAULT){
+                        audioTrack.add(Locale(player.currentTrackGroups.get(i).getFormat(0).language.toString()).displayLanguage)
+                    }
+                }
+
+                val tempTracks = audioTrack.toArray(arrayOfNulls<CharSequence>(audioTrack.size))
+                MaterialAlertDialogBuilder(this,R.style.alertDialog)
+                    .setTitle("Select language")
+                    .setOnCancelListener { playVideo() }
+                    .setBackground(ColorDrawable(0x803700B3.toInt()))
+                    .setItems(tempTracks) {_, position ->
+                        Toast.makeText(this,audioTrack[position]+"Selected",Toast.LENGTH_SHORT).show()
+                        trackSelector.setParameters(trackSelector.buildUponParameters().setPreferredAudioLanguage(audioTrack[position]))
+                    }
+                    .create()
+                    .show()
+            }
+            bindingMF.subtitlesBtn.setOnClickListener {
+                //
+                if (isSubtitle){
+                    trackSelector.parameters = DefaultTrackSelector.ParametersBuilder(this).setRendererDisabled(
+                        C.TRACK_TYPE_VIDEO,true
+                    ).build()
+                    Toast.makeText(this,"Sub off",Toast.LENGTH_SHORT).show()
+                    isSubtitle =false
+                }
+                else{
+                    trackSelector.parameters = DefaultTrackSelector.ParametersBuilder(this).setRendererDisabled(
+                        C.TRACK_TYPE_VIDEO,false
+                    ).build()
+                    Toast.makeText(this,"Sub on",Toast.LENGTH_SHORT).show()
+                    isSubtitle =true
+
+                }
+                dialog.dismiss()
+                playVideo()
+            }
         }
     }
 
@@ -162,10 +215,12 @@ class PlayerActivity : AppCompatActivity() {
         }
         catch(e:Exception){}
 
+        //
+        trackSelector = DefaultTrackSelector(this)
 
         binding.videoTilte.text = playerList[position].title
         binding.videoTilte.isSelected = true
-        player = SimpleExoPlayer.Builder(this).build()
+        player = SimpleExoPlayer.Builder(this).setTrackSelector(trackSelector).build()
         binding.playerView.player = player
         val mediaItem = MediaItem.fromUri(playerList[position].artUri)
         player.setMediaItem(mediaItem)
@@ -246,7 +301,7 @@ class PlayerActivity : AppCompatActivity() {
             Handler(Looper.getMainLooper()).postDelayed(runnable,300)
         }
         Handler(Looper.getMainLooper()).postDelayed(runnable,0)
-}
+    }
     private fun changeVisibility(visibility:Int){
         binding.topController.visibility = visibility
         binding.bottomController.visibility = visibility
@@ -255,7 +310,6 @@ class PlayerActivity : AppCompatActivity() {
         if(isLocked) binding.lockButton.visibility = View.VISIBLE
         else    binding.lockButton.visibility = visibility
     }
-
     override fun onDestroy() {
         super.onDestroy()
         if (isPlayerInitialized) {
