@@ -34,7 +34,11 @@ import com.android19.videoplayer.databinding.SpeedDialogBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 import com.android19.videoplayer.databinding.MoreFeaturesBinding
+import java.text.DecimalFormat
 import java.util.Locale
+import java.util.Timer
+import java.util.TimerTask
+import kotlin.system.exitProcess
 
 @UnstableApi
 class PlayerActivity : AppCompatActivity() {
@@ -42,6 +46,8 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var runnable: Runnable
     private var isSubtitle:Boolean =true
     companion object {
+        private var timer: Timer? = null
+
         lateinit var player: SimpleExoPlayer
         lateinit var playerList: ArrayList<Video>
         var position: Int = -1
@@ -246,20 +252,71 @@ class PlayerActivity : AppCompatActivity() {
             }
             bindingMF.speedBtn.setOnClickListener {
                 dialog.dismiss()
+                playVideo()
                 val customDialogS =
                     LayoutInflater.from(this).inflate(R.layout.speed_dialog, binding.root, false)
                 val bindingS = SpeedDialogBinding.bind(customDialogS)
                 val dialogS = MaterialAlertDialogBuilder(this).setView(customDialogS)
-                    .setOnCancelListener { playVideo() }
-                    .setPositiveButton("OK") { self, _ ->)
-                        playVideo()
+                    .setCancelable(false)
+                    .setPositiveButton("OK") { self, _ ->
                         self.dismiss()
                     }
                     .setBackground(ColorDrawable(0x803700B3.toInt()))
                     .create()
                 dialogS.show()
+                bindingS.speedText.text = "${DecimalFormat("#.##").format(speed)} X"
+                bindingS.minusBtn.setOnClickListener {
+                    changeSpeed(isIncrement = false)
+                    bindingS.speedText.text = "${DecimalFormat("#.##").format(speed)} X"
+                }
+                bindingS.plusBtn.setOnClickListener {
+                    changeSpeed(isIncrement = true)
+                    bindingS.speedText.text = "${DecimalFormat("#.##").format(speed)} X"
+                }
 
             }
+            bindingMF.sleepTimer.setOnClickListener {
+                dialog.dismiss()
+                if (timer != null) Toast.makeText(
+                    this,
+                    "Timer Already Running!!\nClose App to Reset Timer!!",
+                    Toast.LENGTH_SHORT
+                ).show()
+                else {
+                    var sleepTime = 15
+                    val customDialogS = LayoutInflater.from(this)
+                        .inflate(R.layout.speed_dialog, binding.root, false)
+                    val bindingS = SpeedDialogBinding.bind(customDialogS)
+                    val dialogS = MaterialAlertDialogBuilder(this).setView(customDialogS)
+                        .setCancelable(false)
+                        .setPositiveButton("OK") { self, _ ->
+                            timer = Timer()
+                            val task = object : TimerTask() {
+                                override fun run() {
+                                    moveTaskToBack(true)
+                                    exitProcess(1)
+                                }
+                            }
+                            timer!!.schedule(task, sleepTime * 60 * 1000.toLong())
+                            self.dismiss()
+                            playVideo()
+                        }
+                        .setBackground(ColorDrawable(0x803700B3.toInt()))
+                        .create()
+                    dialogS.show()
+                    bindingS.speedText.text = "$sleepTime Min"
+                    bindingS.minusBtn.setOnClickListener {
+                        if (sleepTime > 15) sleepTime -= 15
+                        bindingS.speedText.text = "$sleepTime Min"
+                    }
+                    bindingS.plusBtn.setOnClickListener {
+                        if (sleepTime < 120) sleepTime += 15
+                        bindingS.speedText.text = "$sleepTime Min"
+                    }
+                }
+            }
+
+
         }
     }
     @OptIn(UnstableApi::class)
@@ -268,7 +325,7 @@ class PlayerActivity : AppCompatActivity() {
             player.release()
         }
         catch(e:Exception){}
-
+        speed =1.0f
         //
         trackSelector = DefaultTrackSelector(this)
 
@@ -337,6 +394,18 @@ class PlayerActivity : AppCompatActivity() {
                 else --position
             }
         }
+    }
+    private fun changeSpeed(isIncrement: Boolean) {
+        if (isIncrement) {
+            if (speed <= 2.9f) {
+                speed += 0.10f //speed = speed + 0.10f
+            }
+        } else {
+            if (speed > 0.20f) {
+                speed -= 0.10f
+            }
+        }
+        player.setPlaybackSpeed(speed)
     }
     @SuppressLint("PrivateResource")
     private fun playInFullScreen(enable:Boolean){
