@@ -26,7 +26,9 @@
         <item name="colorOnSecondary">@color/black</item>
         <item name="android:statusBarColor" tools:targetApi="l">?attr/themeColor</item>
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+
     </style>
+
 
     <style name="coolBlue" parent="Theme.MaterialComponents.Light">
         <item name="themeColor">@color/cool_blue</item>
@@ -62,6 +64,7 @@
         <item name="colorOnSecondary">@color/black</item>
         <item name="android:statusBarColor" tools:targetApi="l">?attr/themeColor</item>
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+
     </style>
 
     <style name="holoblueLight" parent="Theme.MaterialComponents.Light">

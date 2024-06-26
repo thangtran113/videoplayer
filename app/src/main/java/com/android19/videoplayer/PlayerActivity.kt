@@ -63,6 +63,8 @@ class PlayerActivity : AppCompatActivity() {
         private lateinit var loudnessEnhancer: LoudnessEnhancer
         private var speed: Float = 1.0f
         //
+        var playbackPosition: Long = 0
+        var keepPlayingId : String =""
     }
 
     @OptIn(UnstableApi::class)
@@ -121,6 +123,16 @@ class PlayerActivity : AppCompatActivity() {
                 playerList = ArrayList(MainActivity.searchList)
                 createPlayer()
             }
+            "keepPlaying" ->{
+                speed = 1.0f
+                binding.videoTilte.text = playerList[position].title
+                binding.videoTilte.isSelected = true
+                binding.playerView.player = player
+
+                playVideo()
+                playInFullScreen(enable = isFullScreen)
+                setVisibility()
+            }
         }
         createPlayer()
         if(repeat){
@@ -141,6 +153,7 @@ class PlayerActivity : AppCompatActivity() {
             } else {
                 playVideo()
             }
+
         }
         binding.nextButton.setOnClickListener {
             nextPreviousVideo()
@@ -372,6 +385,7 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
     @OptIn(UnstableApi::class)
+
     private fun createPlayer() {
         try {
             player.release()
@@ -385,6 +399,11 @@ class PlayerActivity : AppCompatActivity() {
         val mediaItem = MediaItem.fromUri(playerList[position].artUri)
         player.setMediaItem(mediaItem)
         player.prepare()
+
+        if (playbackPosition != 0L) {
+            player.seekTo(playbackPosition) // Phục hồi vị trí phát lại
+        }
+
         player.play()
         isPlayerInitialized = true
         player.addListener(object : Player.Listener {
@@ -402,6 +421,7 @@ class PlayerActivity : AppCompatActivity() {
         loudnessEnhancer = LoudnessEnhancer(player.audioSessionId)
         loudnessEnhancer.enabled = true
     }
+
     private fun setPlayButtonImage(isPlaying: Boolean) {
         if (isPlaying) {
             binding.playButton.setImageResource(R.drawable.pauseicon)
@@ -413,7 +433,9 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+
         if (!isPlayerInitialized) {
+            playbackPosition = 0
             createPlayer()
         } else {
             setPlayButtonImage(player.isPlaying)
@@ -422,12 +444,15 @@ class PlayerActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         if (isPlayerInitialized) {
+            playbackPosition = player.currentPosition
             player.release()
             isPlayerInitialized = false
         }
     }
 
+
     private fun playVideo() {
+        playbackPosition = player.currentPosition
         binding.playButton.setImageResource(R.drawable.pauseicon)
         player.play()
     }
@@ -438,6 +463,7 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun nextPreviousVideo(isNext: Boolean = true) {
+        playbackPosition = 0
         if (isNext) setPosition()
         else setPosition(isIncrement = false)
         createPlayer()

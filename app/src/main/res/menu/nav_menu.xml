@@ -14,16 +14,16 @@
     <!-- Items from nav_menu.xml -->
     <item
         android:id="@+id/themes"
-        android:icon="@drawable/folders_icon"
+        android:icon="@drawable/themes_icon"
         android:title="Themes"/>
     <item
         android:id="@+id/sort"
-        android:icon="@drawable/folders_icon"
+        android:icon="@drawable/sort_icon"
         android:title="Sort"/>
 
     <item
         android:id="@+id/exit"
-        android:icon="@drawable/folders_icon"
+        android:icon="@drawable/exit_icon"
         android:title="Exit"/>
 
 </menu>

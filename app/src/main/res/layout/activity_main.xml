@@ -26,7 +26,7 @@
             android:id="@+id/bottomNav"
             android:layout_width="match_parent"
             android:layout_height="70dp"
-            app:backgroundTint="@color/white"
+            android:background="@color/white"
             app:itemIconTint="@color/black"
             app:itemTextColor="@color/cool_pink"
             app:menu="@menu/bottom_nav" />
