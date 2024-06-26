@@ -37,7 +37,8 @@
            app:layout_constraintVertical_bias="0.958"
            android:backgroundTint="@color/white"
            app:icon="@drawable/play_icon"
-           app:strokeColor="@color/cool_blue"
+           app:iconTint="?attr/themeColor"
+           app:strokeColor="?attr/themeColor"
            app:iconSize="40dp"
            android:visibility="invisible"/>
    </androidx.constraintlayout.widget.ConstraintLayout>

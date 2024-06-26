@@ -27,8 +27,8 @@
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:background="@color/white"
-            app:itemIconTint="@color/black"
-            app:itemTextColor="@color/cool_pink"
+            app:itemIconTint="?attr/themeColor"
+            app:itemTextColor="@android:color/black"
             app:menu="@menu/bottom_nav" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 

@@ -6,10 +6,7 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.widget.Toast
@@ -28,7 +25,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     lateinit var toggle: ActionBarDrawerToggle
 
-    private var runnable: Runnable? = null
+//    private var runnable: Runnable? = null
 
     companion object{
         lateinit var videoList: ArrayList<Video>
@@ -53,8 +50,13 @@ class MainActivity : AppCompatActivity() {
 //    @OptIn(UnstableApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
+
+        val editor = getSharedPreferences("Themes", MODE_PRIVATE)
+        themeIndex = editor.getInt("themeIndex",0)
+
         setTheme(themesList[themeIndex])
+        binding = ActivityMainBinding.inflate(layoutInflater)
+
         setContentView(binding.root)
         //Nav Drawer
         toggle = ActionBarDrawerToggle(this, binding.main, R.string.open, R.string.close)
@@ -82,18 +84,12 @@ class MainActivity : AppCompatActivity() {
                             4 -> bindingTV.themeHoloBlueLight.setBackgroundColor(Color.YELLOW)
                             5 -> bindingTV.themeDarkerGray.setBackgroundColor(Color.YELLOW)
                         }
-                        bindingTV.themePink.setOnClickListener { themeIndex = 0
-                            dialog.dismiss()}
-                        bindingTV.themeCoolBlue.setOnClickListener { themeIndex = 1
-                            dialog.dismiss()}
-                        bindingTV.themeCoolGreen.setOnClickListener { themeIndex = 2
-                            dialog.dismiss()}
-                        bindingTV.themeHoloPurple.setOnClickListener { themeIndex = 3
-                            dialog.dismiss()}
-                        bindingTV.themeHoloBlueLight.setOnClickListener { themeIndex = 4
-                            dialog.dismiss()}
-                        bindingTV.themeDarkerGray.setOnClickListener { themeIndex = 5
-                            dialog.dismiss()}
+                        bindingTV.themePink.setOnClickListener { saveTheme(0)}
+                        bindingTV.themeCoolBlue.setOnClickListener { saveTheme(1)}
+                        bindingTV.themeCoolGreen.setOnClickListener { saveTheme(2)}
+                        bindingTV.themeHoloPurple.setOnClickListener { saveTheme(3)}
+                        bindingTV.themeHoloBlueLight.setOnClickListener { saveTheme(4)}
+                        bindingTV.themeDarkerGray.setOnClickListener { saveTheme(5)}
                 }
                 R.id.sort ->{
                     val menuItems = arrayOf("Latest","Oldest","Name(A - Z)","Name(Z - A)",
@@ -127,16 +123,16 @@ class MainActivity : AppCompatActivity() {
             videoList = getAllVideos()
             setFragment(VideosFragment())
 
-            runnable = Runnable{
-                if(dataChanged){
-                    videoList = getAllVideos()
-                    dataChanged = false
-                    adapterChanged = true
-                }
-                Log.d("MainActivity", "Runnable executed")
-                Handler(Looper.getMainLooper()).postDelayed(runnable!!,300)
-            }
-            Handler(Looper.getMainLooper()).postDelayed(runnable!!,0)
+//            runnable = Runnable{
+//                if(dataChanged){
+//                    videoList = getAllVideos()
+//                    dataChanged = false
+//                    adapterChanged = true
+//                }
+//                Log.d("MainActivity", "Runnable executed")
+//                Handler(Looper.getMainLooper()).postDelayed(runnable!!,300)
+//            }
+//            Handler(Looper.getMainLooper()).postDelayed(runnable!!,0)
         }
 
 
@@ -249,9 +245,19 @@ class MainActivity : AppCompatActivity() {
         cursor?.close()
         return tempList
     }
+    private fun saveTheme(index: Int){
+        val editor = getSharedPreferences("Themes", MODE_PRIVATE).edit()
+        editor.putInt("themeIndex",index)
+        editor.apply()
+        //for restarting
+        finish()
+        startActivity(intent)
+
+
+    }
 
     override fun onDestroy() {
         super.onDestroy()
-        runnable = null
+
     }
 }

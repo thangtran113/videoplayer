@@ -269,6 +269,7 @@ class PlayerActivity : AppCompatActivity(),AudioManager.OnAudioFocusChangeListen
                 dialog.dismiss()
                 playVideo()
                 val audioTrack = ArrayList<String>()
+
                 for (i in 0 until player.currentTrackGroups.length) {
                     if (player.currentTrackGroups.get(i)
                             .getFormat(0).selectionFlags == C.SELECTION_FLAG_DEFAULT
@@ -281,6 +282,9 @@ class PlayerActivity : AppCompatActivity(),AudioManager.OnAudioFocusChangeListen
                     }
                 }
 
+{
+
+                }
                 val tempTracks = audioTrack.toArray(arrayOfNulls<CharSequence>(audioTrack.size))
                 MaterialAlertDialogBuilder(this, R.style.alertDialog)
                     .setTitle("Select language")
@@ -712,7 +716,7 @@ class PlayerActivity : AppCompatActivity(),AudioManager.OnAudioFocusChangeListen
             return false
 
         //minSwipeY for slowly increasing brightness & volume on swipe --> try changing 50 (<50 --> quick swipe & > 50 --> slow swipe
-        // & test with your custom values
+
         if (abs(distanceX) < abs(distanceY) && abs(minSwipeY) > 50) {
             if (event2.x < sWidth / 2) {
                 //brightness

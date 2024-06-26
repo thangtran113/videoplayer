@@ -11,7 +11,7 @@
         android:layout_height="50dp"
         android:contentDescription="@string/image"
         android:src="@drawable/folders_icon"
-        android:tint="@android:color/black"
+        android:tint="?attr/themeColor"
         android:padding="13dp"/>
 
 

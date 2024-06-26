@@ -4,7 +4,7 @@
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
-    <attr name="themeColor" format="color"/>
+
 
     <style name="darker_Grey">#585d66</style>
     //for dialog
@@ -14,14 +14,14 @@
     <style name="Theme.VideoPlayer" parent="Base.Theme.VideoPlayer" />
 
 
-
+    <attr name="themeColor" format="color"/>
     //custom theme
     <style name="coolPinkNav" parent="Theme.MaterialComponents.Light">
         <item name="themeColor">@color/cool_pink</item>
         <item name="colorPrimary">@color/white</item>
-        <item name="colorPrimaryVariant">@color/cool_pink</item>\
+        <item name="colorPrimaryVariant">?attr/themeColor</item>\
         <item name="colorOnPrimary">@color/black</item>
-        <item name="colorSecondary">@color/cool_pink</item>
+        <item name="colorSecondary">?attr/themeColor</item>
         <item name="colorSecondaryVariant">@color/cool_blue</item>
         <item name="colorOnSecondary">@color/black</item>
         <item name="android:statusBarColor" tools:targetApi="l">?attr/themeColor</item>
