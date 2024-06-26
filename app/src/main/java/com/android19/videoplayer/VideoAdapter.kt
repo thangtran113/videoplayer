@@ -11,14 +11,17 @@ import android.os.Environment
 import android.provider.Settings
 import android.text.SpannableStringBuilder
 import android.text.format.DateUtils
+import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.OptIn
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.text.bold
 import androidx.media3.common.util.UnstableApi
 import androidx.recyclerview.widget.RecyclerView
+import com.android19.videoplayer.databinding.DetailsViewBinding
 import com.android19.videoplayer.databinding.RenameFieldBinding
 import com.android19.videoplayer.databinding.VideoMoreFeaturesBinding
 import com.android19.videoplayer.databinding.VideoViewBinding
@@ -132,8 +135,42 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                     .create()
                 dialogRF.show()
                 bindingRF.renameField.text = SpannableStringBuilder(videoList[position].title)
-                dialogRF.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(Color.RED)
-                dialogRF.getButton(AlertDialog.BUTTON_NEGATIVE).setBackgroundColor(Color.RED)
+                dialogRF.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(Color.BLUE)
+                dialogRF.getButton(AlertDialog.BUTTON_NEGATIVE).setBackgroundColor(Color.BLUE)
+            }
+
+            bindingVMF.shareVideo.setOnClickListener {
+                dialog.dismiss()
+                val shareIntent = Intent()
+                shareIntent.action = Intent.ACTION_SEND
+                shareIntent.type = "video/*"
+                shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(videoList[position].path))
+                ContextCompat.startActivity(context, Intent.createChooser(shareIntent,"Sharing Video File"), null)
+            }
+
+            bindingVMF.infoVideo.setOnClickListener {
+              dialog.dismiss()
+                val customDialogDF =
+                    LayoutInflater.from(context).inflate(R.layout.details_view, holder.root, false)
+                val bindingDF = DetailsViewBinding.bind(customDialogDF)
+                val dialogDF = MaterialAlertDialogBuilder(context).setView(customDialogDF)
+                    .setCancelable(false)
+                    .setPositiveButton("OK"){self, _ ->
+                        self.dismiss()
+                    }
+
+                    .create()
+                dialogDF.show()
+                val detailText = SpannableStringBuilder()
+                    .bold { append("Details\n\nName: ") }.append(videoList[position].title)
+                    .bold { append("\n\nDuration: ") }.append(DateUtils.formatElapsedTime(videoList[position].duration/1000))
+                    .bold { append("\n\nFile Size: ") }.append(Formatter.formatShortFileSize(context,videoList[position].size.toLong()))
+                    .bold { append("\n\nLocation: ") }.append(videoList[position].path)
+
+
+                bindingDF.detailTV.text = detailText
+                dialogDF.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(Color.BLUE)
+
             }
 
             return@setOnLongClickListener true

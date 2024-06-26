@@ -26,6 +26,7 @@
             android:maxLength="200"
             tools:ignore="SpeakableTextPresentCheck"
             android:textColor="@color/black"
+            android:textCursorDrawable="@color/black"
             />
 
     </com.google.android.material.textfield.TextInputLayout>
