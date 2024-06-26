@@ -25,6 +25,8 @@ class MainActivity : AppCompatActivity() {
     companion object{
         lateinit var videoList: ArrayList<Video>
         lateinit var folderList: ArrayList<Folder>
+        lateinit var searchList: ArrayList<Video>
+        var search: Boolean = false
         var themeIndex: Int = 0
         val themesList = arrayOf(R.style.coolPinkNav, R.style.coolBlue,
             R.style.coolGreen, R.style.holoPurple, R.style.holoblueLight, R.style.darkerGrey)

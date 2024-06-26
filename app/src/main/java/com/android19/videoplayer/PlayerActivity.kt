@@ -116,6 +116,11 @@ class PlayerActivity : AppCompatActivity() {
             "FolderActivity" -> {
                 playerList = ArrayList(FoldersActivity.currentFolderVideo)
             }
+            "SearchedVideos" ->{
+                playerList = ArrayList()
+                playerList = ArrayList(MainActivity.searchList)
+                createPlayer()
+            }
         }
         createPlayer()
         if(repeat){

@@ -1,5 +1,6 @@
 package com.android19.videoplayer
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.text.format.DateUtils
@@ -8,7 +9,6 @@ import android.view.ViewGroup
 import androidx.annotation.OptIn
 import androidx.core.content.ContextCompat
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.SimpleExoPlayer
 import androidx.recyclerview.widget.RecyclerView
 import com.android19.videoplayer.databinding.VideoViewBinding
 import com.bumptech.glide.Glide
@@ -46,9 +46,13 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                     PlayerActivity.pipStatus = 1
                     sendIntent(pos = position, ref = "FolderActivity")
                 }
+                MainActivity.search -> {
+                    PlayerActivity.pipStatus = 2
+                    sendIntent(pos = position, ref = "SearchedVideos")
+                }
                 else->
                 {
-                    PlayerActivity.pipStatus = 2
+                    PlayerActivity.pipStatus = 3
                     sendIntent(pos = position, ref = "AllVideos")
                 }
             }
@@ -67,5 +71,11 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         intent.putExtra("class",ref)
         ContextCompat.startActivity(context,intent,null)
 
+    }
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateList(searchList: ArrayList<Video>){
+        videoList = ArrayList()
+        videoList.addAll(searchList)
+        notifyDataSetChanged()
     }
 }
