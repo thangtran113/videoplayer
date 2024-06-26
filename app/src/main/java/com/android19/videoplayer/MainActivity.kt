@@ -3,9 +3,11 @@ package com.android19.videoplayer
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.view.LayoutInflater
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -13,6 +15,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.android19.videoplayer.databinding.ActivityMainBinding
+import com.android19.videoplayer.databinding.ThemesViewBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -21,10 +25,14 @@ class MainActivity : AppCompatActivity() {
     companion object{
         lateinit var videoList: ArrayList<Video>
         lateinit var folderList: ArrayList<Folder>
+        var themeIndex: Int = 0
+        val themesList = arrayOf(R.style.coolPinkNav, R.style.coolBlue,
+            R.style.coolGreen, R.style.holoPurple, R.style.holoblueLight, R.style.darkerGrey)
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
+        setTheme(themesList[themeIndex])
         setContentView(binding.root)
         //Nav Drawer
         toggle = ActionBarDrawerToggle(this, binding.main, R.string.open, R.string.close)
@@ -32,15 +40,42 @@ class MainActivity : AppCompatActivity() {
         toggle.syncState()
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        // Xử lý sự kiện khi mục trong header NavigationView được nhấn
-        binding.headerNavView.setNavigationItemSelectedListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.open_drawer -> {
-                    binding.main.openDrawer(binding.navView)
-                    true
+
+        binding.navView.setNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.themes->{
+
+                    val customDialog =
+                        LayoutInflater.from(this).inflate(R.layout.themes_view, binding.root, false)
+                    val bindingTV = ThemesViewBinding.bind(customDialog)
+                    val dialog = MaterialAlertDialogBuilder(this).setView(customDialog)
+                        .setTitle("Select Theme")
+                        .create()
+                    dialog.show()
+                        when(themeIndex){
+                            0 -> bindingTV.themePink.setBackgroundColor(Color.YELLOW)
+                            1 -> bindingTV.themeCoolBlue.setBackgroundColor(Color.YELLOW)
+                            2 -> bindingTV.themeCoolGreen.setBackgroundColor(Color.YELLOW)
+                            3 -> bindingTV.themeHoloPurple.setBackgroundColor(Color.YELLOW)
+                            4 -> bindingTV.themeHoloBlueLight.setBackgroundColor(Color.YELLOW)
+                            5 -> bindingTV.themeDarkerGray.setBackgroundColor(Color.YELLOW)
+                        }
+                        bindingTV.themePink.setOnClickListener { themeIndex = 0
+                            dialog.dismiss()}
+                        bindingTV.themeCoolBlue.setOnClickListener { themeIndex = 1
+                            dialog.dismiss()}
+                        bindingTV.themeCoolGreen.setOnClickListener { themeIndex = 2
+                            dialog.dismiss()}
+                        bindingTV.themeHoloPurple.setOnClickListener { themeIndex = 3
+                            dialog.dismiss()}
+                        bindingTV.themeHoloBlueLight.setOnClickListener { themeIndex = 4
+                            dialog.dismiss()}
+                        bindingTV.themeDarkerGray.setOnClickListener { themeIndex = 5
+                            dialog.dismiss()}
                 }
                 else -> false
             }
+            return@setNavigationItemSelectedListener true
         }
 
         if (requestRuntimePermission()){

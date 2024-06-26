@@ -18,6 +18,7 @@ class VideosFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        requireContext().theme.applyStyle(MainActivity.themesList[MainActivity.themeIndex],true)
         val view = inflater.inflate(R.layout.fragment_videos, container, false)
         val binding = FragmentVideosBinding.bind(view)
         binding.videoRV.setHasFixedSize(true)

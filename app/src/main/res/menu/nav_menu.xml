@@ -1,18 +1,29 @@
-<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/feedbackNav"
-        android:title="@string/Feedback"
-        android:icon="@drawable/folders_icon"/>
-    <item android:id="@+id/themesNav"
-        android:title="@string/themes"
-        android:icon="@drawable/folders_icon"/>
-    <item android:id="@+id/sortOrder"
-        android:title="@string/sort_order"
-        android:icon="@drawable/folders_icon"/>
-    <item android:id="@+id/aboutNav"
-        android:title="@string/about"
-        android:icon="@drawable/folders_icon"/>
-    <item android:id="@+id/exitNav"
-        android:title="@string/exit"
-        android:icon="@drawable/folders_icon"/>
+    <!-- Items from header_menu.xml -->
+
+
+<!--    &lt;!&ndash; Divider &ndash;&gt;-->
+<!--    <item-->
+<!--        android:title="Divider"-->
+<!--        android:enabled="false">-->
+<!--        <menu>-->
+<!--            <item android:title=" " android:enabled="false" />-->
+<!--        </menu>-->
+<!--    </item>-->
+
+    <!-- Items from nav_menu.xml -->
+    <item
+        android:id="@+id/themes"
+        android:icon="@drawable/folders_icon"
+        android:title="Themes"/>
+    <item
+        android:id="@+id/sort"
+        android:icon="@drawable/folders_icon"
+        android:title="Sort"/>
+
+    <item
+        android:id="@+id/exit"
+        android:icon="@drawable/folders_icon"
+        android:title="Exit"/>
+
 </menu>
