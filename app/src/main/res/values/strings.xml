@@ -41,4 +41,12 @@
     <string name="pip_mode">PIP Mode</string>
     <string name="apply_to_all">Aplly to all</string>
     <string name="search">Search</string>
+
+
+
+    //More video features
+    <string name="rename">Rename</string>
+    <string name="delete">Delete</string>
+    <string name="info">Details</string>
+    <string name="share">Share</string>
 </resources>

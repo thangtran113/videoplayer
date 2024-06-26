@@ -70,11 +70,14 @@ class VideosFragment : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @OptIn(UnstableApi::class)
     override fun onResume() {
         super.onResume()
         if(PlayerActivity.position != -1) {
             binding.nowPlayingBtn.visibility = View.VISIBLE
+            if(MainActivity.dataChanged) adapter.notifyDataSetChanged()
+            MainActivity.dataChanged = false
         }
     }
 }

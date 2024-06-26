@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity() {
         private var sortValue:Int = 0
         val themesList = arrayOf(R.style.coolPinkNav, R.style.coolBlue,
             R.style.coolGreen, R.style.holoPurple, R.style.holoblueLight, R.style.darkerGrey)
+        var dataChanged : Boolean = false
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,6 +121,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.bottomNav.setOnItemSelectedListener {
+            if(dataChanged) videoList = getAllVideos()
             when(it.itemId){
                 R.id.videoView -> setFragment(VideosFragment())
                 R.id.folderView -> setFragment(FoldersFragment())

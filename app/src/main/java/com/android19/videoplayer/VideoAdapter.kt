@@ -3,17 +3,30 @@ package com.android19.videoplayer
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.media.MediaScannerConnection
+import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.provider.Settings
+import android.text.SpannableStringBuilder
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.OptIn
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.media3.common.util.UnstableApi
 import androidx.recyclerview.widget.RecyclerView
+import com.android19.videoplayer.databinding.RenameFieldBinding
+import com.android19.videoplayer.databinding.VideoMoreFeaturesBinding
 import com.android19.videoplayer.databinding.VideoViewBinding
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.io.File
 
 class VideoAdapter(private val context: Context, private var videoList: ArrayList<Video>,
                    private val isFolder:Boolean=false) : RecyclerView.Adapter<VideoAdapter.MyHolder>() {
@@ -42,9 +55,10 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
             .into(holder.image)
         holder.root.setOnClickListener {
             when{
-                 videoList[position].id == PlayerActivity.nowPlayingId -> {
+                 videoList[position].id == PlayerActivity.keepPlayingId -> {
                      sendIntent(pos = position, ref = "NowPlaying")
                 }
+
                 isFolder -> {
                     PlayerActivity.pipStatus = 1
                     sendIntent(pos = position, ref = "FolderActivity")
@@ -60,6 +74,69 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                 }
             }
 
+        }
+        holder.root.setOnLongClickListener{
+            val customDialog =
+                LayoutInflater.from(context).inflate(R.layout.video_more_features, holder.root, false)
+            val bindingVMF = VideoMoreFeaturesBinding.bind(customDialog)
+            val dialog = MaterialAlertDialogBuilder(context).setView(customDialog)
+                .create()
+            dialog.show()
+
+            bindingVMF.renameVideo.setOnClickListener {
+                requestPermissionR()
+                dialog.dismiss()
+                val customDialogRF =
+                LayoutInflater.from(context).inflate(R.layout.rename_field, holder.root, false)
+                val bindingRF = RenameFieldBinding.bind(customDialogRF)
+                val dialogRF = MaterialAlertDialogBuilder(context).setView(customDialogRF)
+                    .setCancelable(false)
+                    .setPositiveButton("Rename"){self, _ ->
+                        val currentFile = File(videoList[position].path)
+                        val newName = bindingRF.renameField.text
+                        if(newName != null && currentFile.exists() && newName.toString().isNotEmpty()){
+                            val newFile = File(currentFile.parentFile,newName.toString()+"."+currentFile.extension)
+                            if(currentFile.renameTo(newFile)){
+                                MediaScannerConnection.scanFile(context, arrayOf(newFile.toString()), arrayOf("video/*"), null)
+                               when{
+                                   MainActivity.search ->{
+                                       MainActivity.searchList[position].title = newName.toString()
+                                       MainActivity.searchList[position].path = newFile.path
+                                       MainActivity.searchList[position].artUri = Uri.fromFile(newFile)
+                                       notifyItemChanged(position)
+                                   }
+                                       isFolder ->{
+                                       FoldersActivity.currentFolderVideo[position].title = newName.toString()
+                                       FoldersActivity.currentFolderVideo[position].path = newFile.path
+                                       FoldersActivity.currentFolderVideo[position].artUri = Uri.fromFile(newFile)
+                                       notifyItemChanged(position)
+                                           MainActivity.dataChanged = true
+                                   }
+                                       else->{
+                                           MainActivity.videoList[position].title = newName.toString()
+                                           MainActivity.videoList[position].path = newFile.path
+                                           MainActivity.videoList[position].artUri = Uri.fromFile(newFile)
+                                           notifyItemChanged(position)
+                                       }
+                                   }
+                               }
+                                else{
+                                    Toast.makeText(context,"Permission Denied!!", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                        self.dismiss()
+                    }
+                    .setNegativeButton("Cancel"){self, _ ->
+                        self.dismiss()
+                    }
+                    .create()
+                dialogRF.show()
+                bindingRF.renameField.text = SpannableStringBuilder(videoList[position].title)
+                dialogRF.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(Color.RED)
+                dialogRF.getButton(AlertDialog.BUTTON_NEGATIVE).setBackgroundColor(Color.RED)
+            }
+
+            return@setOnLongClickListener true
         }
     }
 
@@ -80,5 +157,21 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         videoList = ArrayList()
         videoList.addAll(searchList)
         notifyDataSetChanged()
+    }
+
+
+
+
+    //Requesting permisson for Android >= 11
+    private fun requestPermissionR(){
+        (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                if(!Environment.isExternalStorageManager()){
+                    val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                    intent.addCategory("android.intent.category.DEFAULT")
+                    intent.data = Uri.parse("package:${context.applicationContext.packageName}")
+                    ContextCompat.startActivity(context,intent, null)
+                }
+            }
+        )
     }
 }
