@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         var themeIndex: Int = 0
         var sortValue:Int = 0
         val themesList = arrayOf(R.style.coolPinkNav, R.style.coolBlue,
-            R.style.coolGreen, R.style.holoPurple, R.style.holoblueLight, R.style.darkerGrey)
+            R.style.coolGreen, R.style.holoPurple, R.style.holoblueLight, R.style.darkerGrey, R.style.red, R.style.darkOrange, R.style.yellow)
         var dataChanged : Boolean = false
         var adapterChanged : Boolean = false
         val sortList = arrayOf(
@@ -77,12 +77,16 @@ class MainActivity : AppCompatActivity() {
                         .create()
                     dialog.show()
                         when(themeIndex){
-                            0 -> bindingTV.themePink.setBackgroundColor(Color.YELLOW)
-                            1 -> bindingTV.themeCoolBlue.setBackgroundColor(Color.YELLOW)
-                            2 -> bindingTV.themeCoolGreen.setBackgroundColor(Color.YELLOW)
-                            3 -> bindingTV.themeHoloPurple.setBackgroundColor(Color.YELLOW)
-                            4 -> bindingTV.themeHoloBlueLight.setBackgroundColor(Color.YELLOW)
-                            5 -> bindingTV.themeDarkerGray.setBackgroundColor(Color.YELLOW)
+                            0 -> bindingTV.themePink.setBackgroundColor(Color.CYAN)
+                            1 -> bindingTV.themeCoolBlue.setBackgroundColor(Color.CYAN)
+                            2 -> bindingTV.themeCoolGreen.setBackgroundColor(Color.CYAN)
+                            3 -> bindingTV.themeHoloPurple.setBackgroundColor(Color.CYAN)
+                            4 -> bindingTV.themeHoloBlueLight.setBackgroundColor(Color.CYAN)
+                            5 -> bindingTV.themeDarkerGray.setBackgroundColor(Color.CYAN)
+                            6 -> bindingTV.themeRed.setBackgroundColor(Color.CYAN)
+                            7 -> bindingTV.themeOrange.setBackgroundColor(Color.CYAN)
+                            8 -> bindingTV.themeYellow.setBackgroundColor(Color.CYAN)
+
                         }
                         bindingTV.themePink.setOnClickListener { saveTheme(0)}
                         bindingTV.themeCoolBlue.setOnClickListener { saveTheme(1)}
@@ -90,6 +94,9 @@ class MainActivity : AppCompatActivity() {
                         bindingTV.themeHoloPurple.setOnClickListener { saveTheme(3)}
                         bindingTV.themeHoloBlueLight.setOnClickListener { saveTheme(4)}
                         bindingTV.themeDarkerGray.setOnClickListener { saveTheme(5)}
+                        bindingTV.themeRed.setOnClickListener { saveTheme(6)}
+                        bindingTV.themeOrange.setOnClickListener { saveTheme(7)}
+                        bindingTV.themeYellow.setOnClickListener { saveTheme(8)}
                 }
                 R.id.sort ->{
                     val menuItems = arrayOf("Latest","Oldest","Name(A - Z)","Name(Z - A)",
@@ -178,6 +185,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
         if (toggle.onOptionsItemSelected(item)) {
             return true
         }

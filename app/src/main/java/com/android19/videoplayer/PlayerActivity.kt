@@ -171,7 +171,7 @@ class PlayerActivity : AppCompatActivity(),AudioManager.OnAudioFocusChangeListen
                 createPlayer()
             }
             "keepPlaying" ->{
-                keepPlayingId = playerList[position].id
+
                 speed = 1.0f
                 videoTilte.text = playerList[position].title
                 videoTilte.isSelected = true
@@ -534,10 +534,11 @@ class PlayerActivity : AppCompatActivity(),AudioManager.OnAudioFocusChangeListen
 
 
     private fun playVideo() {
-        playbackPosition = 0
-       playPauseBtn.setImageResource(R.drawable.pauseicon)
+
+        playPauseBtn.setImageResource(R.drawable.pauseicon)
         player.play()
     }
+
 
     private fun pauseVideo() {
         playPauseBtn.setImageResource(R.drawable.play_icon)
@@ -628,13 +629,19 @@ class PlayerActivity : AppCompatActivity(),AudioManager.OnAudioFocusChangeListen
 
     override fun onResume() {
         super.onResume()
-        if (audioManager == null) audioManager =
-            getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        audioManager!!.requestAudioFocus(
-            this,
-            AudioManager.STREAM_MUSIC,
-            AudioManager.AUDIOFOCUS_GAIN
-        )
+        if (audioManager == null) {
+            audioManager =
+                getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            audioManager!!.requestAudioFocus(
+                this,
+                AudioManager.STREAM_MUSIC,
+                AudioManager.AUDIOFOCUS_GAIN
+            )
+        }else{
+            playVideo()
+        }
+
+
         if (brightness != 0) setScreenBrightness(brightness)
     }
         @SuppressLint("ClickableViewAccessibility")

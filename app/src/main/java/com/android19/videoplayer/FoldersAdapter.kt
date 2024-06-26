@@ -2,15 +2,12 @@ package com.android19.videoplayer
 
 import android.content.Context
 import android.content.Intent
-import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.android19.videoplayer.databinding.FoldersViewBinding
-import com.android19.videoplayer.databinding.VideoViewBinding
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
+
 
 class FoldersAdapter(private val context: Context, private var foldersList: ArrayList<Folder>) :
     RecyclerView.Adapter<FoldersAdapter.MyHolder>() {

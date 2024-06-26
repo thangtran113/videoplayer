@@ -14,7 +14,7 @@
         android:text="@string/navText1"
         android:fontFamily="@font/lufgablack"
         android:textStyle="bold"
-        android:textSize="45dp"
+        android:textSize="40dp"
         android:textColor="@android:color/black"
         android:layout_marginTop="125dp"
         android:layout_marginLeft="15dp"

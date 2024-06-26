@@ -49,7 +49,7 @@ class VideosFragment : Fragment() {
         //nowPLaying
         binding.keepPlayingBtn.setOnClickListener{
             val intent = Intent(requireContext(),PlayerActivity::class.java)
-            intent.putExtra("class","NowPlaying")
+            intent.putExtra("class","keepPlaying")
             startActivity(intent)
         }
         return view

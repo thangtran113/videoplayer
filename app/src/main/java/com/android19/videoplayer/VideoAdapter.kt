@@ -57,8 +57,8 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
             .into(holder.image)
         holder.root.setOnClickListener {
             when{
-                 videoList[position].id == PlayerActivity.keepPlayingId -> {
-                     sendIntent(pos = position, ref = "NowPlaying")
+                videoList[position].id == PlayerActivity.keepPlayingId -> {
+                    sendIntent(pos = position, ref = "keepPlaying")
                 }
 
                 isFolder -> {
@@ -89,7 +89,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                 requestPermissionR()
                 dialog.dismiss()
                 val customDialogRF =
-                LayoutInflater.from(context).inflate(R.layout.rename_field, holder.root, false)
+                    LayoutInflater.from(context).inflate(R.layout.rename_field, holder.root, false)
                 val bindingRF = RenameFieldBinding.bind(customDialogRF)
                 val dialogRF = MaterialAlertDialogBuilder(context).setView(customDialogRF)
                     .setCancelable(false)
@@ -100,30 +100,30 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                             val newFile = File(currentFile.parentFile,newName.toString()+"."+currentFile.extension)
                             if(currentFile.renameTo(newFile)){
                                 MediaScannerConnection.scanFile(context, arrayOf(newFile.toString()), arrayOf("video/*"), null)
-                               when{
-                                   MainActivity.search ->{
-                                       MainActivity.searchList[position].title = newName.toString()
-                                       MainActivity.searchList[position].path = newFile.path
-                                       MainActivity.searchList[position].artUri = Uri.fromFile(newFile)
-                                       notifyItemChanged(position)
-                                   }
-                                       isFolder ->{
-                                       FoldersActivity.currentFolderVideo[position].title = newName.toString()
-                                       FoldersActivity.currentFolderVideo[position].path = newFile.path
-                                       FoldersActivity.currentFolderVideo[position].artUri = Uri.fromFile(newFile)
-                                       notifyItemChanged(position)
-                                           MainActivity.dataChanged = true
-                                   }
-                                       else->{
-                                           MainActivity.videoList[position].title = newName.toString()
-                                           MainActivity.videoList[position].path = newFile.path
-                                           MainActivity.videoList[position].artUri = Uri.fromFile(newFile)
-                                           notifyItemChanged(position)
-                                       }
-                                   }
-                               }
-                                else{
-                                    Toast.makeText(context,"Permission Denied!!", Toast.LENGTH_SHORT).show()
+                                when{
+                                    MainActivity.search ->{
+                                        MainActivity.searchList[position].title = newName.toString()
+                                        MainActivity.searchList[position].path = newFile.path
+                                        MainActivity.searchList[position].artUri = Uri.fromFile(newFile)
+                                        notifyItemChanged(position)
+                                    }
+                                    isFolder ->{
+                                        FoldersActivity.currentFolderVideo[position].title = newName.toString()
+                                        FoldersActivity.currentFolderVideo[position].path = newFile.path
+                                        FoldersActivity.currentFolderVideo[position].artUri = Uri.fromFile(newFile)
+                                        notifyItemChanged(position)
+                                        MainActivity.dataChanged = true
+                                    }
+                                    else->{
+                                        MainActivity.videoList[position].title = newName.toString()
+                                        MainActivity.videoList[position].path = newFile.path
+                                        MainActivity.videoList[position].artUri = Uri.fromFile(newFile)
+                                        notifyItemChanged(position)
+                                    }
+                                }
+                            }
+                            else{
+                                Toast.makeText(context,"Permission Denied!!", Toast.LENGTH_SHORT).show()
                             }
                         }
                         self.dismiss()
@@ -148,7 +148,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
             }
 
             bindingVMF.infoVideo.setOnClickListener {
-              dialog.dismiss()
+                dialog.dismiss()
                 val customDialogDF =
                     LayoutInflater.from(context).inflate(R.layout.details_view, holder.root, false)
                 val bindingIF = DetailsViewBinding.bind(customDialogDF)
@@ -201,10 +201,10 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                                 }
                             }
                         }
-                            else{
-                                Toast.makeText(context,"Permission Denied!", Toast.LENGTH_SHORT).show()
+                        else{
+                            Toast.makeText(context,"Permission Denied!", Toast.LENGTH_SHORT).show()
                         }
-                            self.dismiss()
+                        self.dismiss()
                     }
                     .setNegativeButton("NO"){self, _ ->
                         self.dismiss()
@@ -245,13 +245,13 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
     //Requesting permisson for Android >= 11
     private fun requestPermissionR(){
         (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                if(!Environment.isExternalStorageManager()){
-                    val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-                    intent.addCategory("android.intent.category.DEFAULT")
-                    intent.data = Uri.parse("package:${context.applicationContext.packageName}")
-                    ContextCompat.startActivity(context,intent, null)
-                }
+            if(!Environment.isExternalStorageManager()){
+                val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                intent.addCategory("android.intent.category.DEFAULT")
+                intent.data = Uri.parse("package:${context.applicationContext.packageName}")
+                ContextCompat.startActivity(context,intent, null)
             }
-        )
+        }
+                )
     }
 }
