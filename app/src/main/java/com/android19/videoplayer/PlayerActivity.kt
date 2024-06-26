@@ -5,6 +5,7 @@ package com.android19.videoplayer
 import android.annotation.SuppressLint
 import android.app.AppOpsManager
 import android.app.PictureInPictureParams
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
@@ -183,7 +184,7 @@ class PlayerActivity : AppCompatActivity(),AudioManager.OnAudioFocusChangeListen
         }
         createPlayer()
         if(repeat){
-            findViewById<ImageButton>(R.id.repeatButton).setImageResource(com.google.android.exoplayer2.ui.R.drawable.exo_controls_repeat_one)
+            findViewById<ImageButton>(R.id.repeatButton).setImageResource(com.google.android.exoplayer2.ui.R.drawable.exo_controls_repeat_all)
         }
         else findViewById<ImageButton>(R.id.repeatButton).setImageResource(com.google.android.exoplayer2.ui.R.drawable.exo_controls_repeat_off)
     }
@@ -221,9 +222,9 @@ class PlayerActivity : AppCompatActivity(),AudioManager.OnAudioFocusChangeListen
             if (repeat) {
                 repeat = false
                 player.repeatMode = Player.REPEAT_MODE_OFF
-                findViewById<ImageButton>(R.id.repeatButton).setImageResource(com.google.android.exoplayer2.ui.R.drawable.exo_controls_repeat_one)
+                findViewById<ImageButton>(R.id.repeatButton).setImageResource(com.google.android.exoplayer2.ui.R.drawable.exo_controls_repeat_all)
             } else {
-                repeat = false
+                repeat = true
                 player.repeatMode = Player.REPEAT_MODE_ONE
                 findViewById<ImageButton>(R.id.repeatButton).setImageResource(com.google.android.exoplayer2.ui.R.drawable.exo_controls_repeat_off)
             }
@@ -623,21 +624,14 @@ class PlayerActivity : AppCompatActivity(),AudioManager.OnAudioFocusChangeListen
 
     override fun onResume() {
         super.onResume()
-        if (isPlayerInitialized && !player.isPlaying) {
-            player.play()
-        }else {
-            if (audioManager == null) {
-                audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
-            }
-            audioManager!!.requestAudioFocus(
-                this,
-                AudioManager.STREAM_MUSIC,
-                AudioManager.AUDIOFOCUS_GAIN
-            )
-
-            // Check if player is initialized and not playing, then play the video
-        }
-        if(brightness != 0) setScreenBrightness(brightness)
+        if (audioManager == null) audioManager =
+            getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        audioManager!!.requestAudioFocus(
+            this,
+            AudioManager.STREAM_MUSIC,
+            AudioManager.AUDIOFOCUS_GAIN
+        )
+        if (brightness != 0) setScreenBrightness(brightness)
     }
         @SuppressLint("ClickableViewAccessibility")
         private fun doubleTapEnable(){
@@ -708,9 +702,17 @@ class PlayerActivity : AppCompatActivity(),AudioManager.OnAudioFocusChangeListen
         distanceX: Float,
         distanceY: Float
     ): Boolean {
+        minSwipeY += distanceY
+
         val sWidth = Resources.getSystem().displayMetrics.widthPixels
+        val sHeight = Resources.getSystem().displayMetrics.heightPixels
 
+        val border = 100 * Resources.getSystem().displayMetrics.density.toInt()
+        if (event2.x < border || event2.y < border || event2.x > sWidth - border || event2.y > sHeight - border)
+            return false
 
+        //minSwipeY for slowly increasing brightness & volume on swipe --> try changing 50 (<50 --> quick swipe & > 50 --> slow swipe
+        // & test with your custom values
         if (abs(distanceX) < abs(distanceY) && abs(minSwipeY) > 50) {
             if (event2.x < sWidth / 2) {
                 //brightness
@@ -737,6 +739,7 @@ class PlayerActivity : AppCompatActivity(),AudioManager.OnAudioFocusChangeListen
 
         return true
     }
+
     private fun setScreenBrightness(value: Int){
         val d = 1.0f/30
         val lp = this.window.attributes
