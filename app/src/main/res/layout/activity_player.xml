@@ -7,16 +7,27 @@
     android:layout_height="match_parent"
     tools:context=".PlayerActivity"
     android:background="@color/black">
-
-    <androidx.media3.ui.PlayerView
+<FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <com.github.vkay94.dtpv.DoubleTapPlayerView
         android:id="@+id/playerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:controller_layout_id="@layout/custom_control_view"
+        app:dtpv_controller="@id/ytOverlay"
         android:keepScreenOn="true"
         app:show_buffering="always"
         />
-
+    <com.github.vkay94.dtpv.youtube.YouTubeOverlay
+        android:id="@+id/ytOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:yt_playerView="@id/playerView"
+        android:background="#77000000"
+        android:visibility="invisible"
+        />
+</FrameLayout>
     <ImageButton
         android:id="@+id/lockButton"
         android:layout_width="50dp"
@@ -32,34 +43,34 @@
         android:id="@+id/brightnessIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="#42000000"
+        android:drawableLeft="@drawable/brightnesss_icon"
+        android:text="@string/O"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/playerView"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-         android:drawableLeft="@drawable/brightnesss_icon"
-        android:text="@string/O"
-        tools:ignore="RtlHardcoded"
-        android:textSize="16sp"
-        android:textColor="@color/white"
-        android:textStyle="bold"
-        android:background="#42000000"
-        android:visibility="gone"/>
+        tools:ignore="RtlHardcoded"/>
     <Button
         android:id="@+id/volumeIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/playerView"
-        app:layout_constraintTop_toTopOf="parent"
+        android:background="#42000000"
         android:drawableLeft="@drawable/volume_icon"
         android:text="@string/O"
-        tools:ignore="RtlHardcoded"
-        android:textSize="16sp"
         android:textColor="@color/white"
+        android:textSize="16sp"
         android:textStyle="bold"
-        android:background="#42000000"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="RtlHardcoded"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

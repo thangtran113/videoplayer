@@ -15,11 +15,9 @@ import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.annotation.OptIn
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.text.bold
-import androidx.media3.common.util.UnstableApi
 import androidx.recyclerview.widget.RecyclerView
 import com.android19.videoplayer.databinding.DetailsViewBinding
 import com.android19.videoplayer.databinding.RenameFieldBinding
@@ -46,7 +44,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    @OptIn(UnstableApi::class)
+//    @OptIn(UnstableApi::class)
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
         holder.title.text = videoList[position].title
         holder.folder.text = videoList[position].folderName
@@ -226,7 +224,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         return videoList.size
     }
 
-    @OptIn(UnstableApi::class)
+
     private fun sendIntent(pos: Int, ref:String){
         PlayerActivity.position = pos
         val intent = Intent(context,PlayerActivity::class.java)

@@ -8,10 +8,8 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.OptIn
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
-import androidx.media3.common.util.UnstableApi
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.android19.videoplayer.databinding.FragmentVideosBinding
 
@@ -23,7 +21,7 @@ class VideosFragment : Fragment() {
         setHasOptionsMenu(true)
     }
 
-    @OptIn(UnstableApi::class)
+
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -80,7 +78,7 @@ class VideosFragment : Fragment() {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    @OptIn(UnstableApi::class)
+
     override fun onResume() {
         super.onResume()
         if(PlayerActivity.position != -1) {

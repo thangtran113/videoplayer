@@ -1,5 +1,7 @@
 package com.android19.videoplayer
 
+
+
 import android.annotation.SuppressLint
 import android.app.AppOpsManager
 import android.app.PictureInPictureParams
@@ -21,7 +23,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
-import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
@@ -32,21 +33,20 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.media3.common.C
-import androidx.media3.common.MediaItem
-import androidx.media3.common.Player
-import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-
-import androidx.media3.ui.AspectRatioFrameLayout
-import androidx.media3.ui.DefaultTimeBar
-import androidx.media3.ui.PlayerControlView
-import androidx.media3.ui.TimeBar
 import com.android19.videoplayer.databinding.ActivityPlayerBinding
 import com.android19.videoplayer.databinding.BoosterBinding
 import com.android19.videoplayer.databinding.MoreFeaturesBinding
 import com.android19.videoplayer.databinding.SpeedDialogBinding
+import com.github.vkay94.dtpv.youtube.YouTubeOverlay
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
+import com.google.android.exoplayer2.ui.DefaultTimeBar
+import com.google.android.exoplayer2.ui.PlayerControlView
+import com.google.android.exoplayer2.ui.TimeBar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.io.File
 import java.text.DecimalFormat
@@ -57,7 +57,7 @@ import kotlin.math.abs
 import kotlin.system.exitProcess
 
 
-@UnstableApi
+//@UnstableApi
 class PlayerActivity : AppCompatActivity(),AudioManager.OnAudioFocusChangeListener, GestureDetector.OnGestureListener{
     private lateinit var binding: ActivityPlayerBinding
 
@@ -174,7 +174,7 @@ class PlayerActivity : AppCompatActivity(),AudioManager.OnAudioFocusChangeListen
                 speed = 1.0f
                 videoTilte.text = playerList[position].title
                 videoTilte.isSelected = true
-                binding.playerView.player = player
+                doubleTapEnable()
                 playVideo()
                 playInFullScreen(enable = isFullScreen)
                 seekBarFeature()
@@ -183,9 +183,9 @@ class PlayerActivity : AppCompatActivity(),AudioManager.OnAudioFocusChangeListen
         }
         createPlayer()
         if(repeat){
-            findViewById<ImageButton>(R.id.repeatButton).setImageResource(androidx.media3.ui.R.drawable.exo_legacy_controls_repeat_all)
+            findViewById<ImageButton>(R.id.repeatButton).setImageResource(com.google.android.exoplayer2.ui.R.drawable.exo_controls_repeat_one)
         }
-        else findViewById<ImageButton>(R.id.repeatButton).setImageResource(androidx.media3.ui.R.drawable.exo_legacy_controls_repeat_off)
+        else findViewById<ImageButton>(R.id.repeatButton).setImageResource(com.google.android.exoplayer2.ui.R.drawable.exo_controls_repeat_off)
     }
 
     @SuppressLint("PrivateResource", "SourceLockedOrientationActivity")
@@ -200,22 +200,6 @@ class PlayerActivity : AppCompatActivity(),AudioManager.OnAudioFocusChangeListen
         }
 
 
-        findViewById<FrameLayout>(R.id.forwardFrameBtn).setOnClickListener(DoubleClickListener(callback = object : DoubleClickListener.Callback {
-            override fun doubleClicked() {
-                binding.playerView.showController()
-                findViewById<ImageButton>(R.id.forwardButton).visibility = View.VISIBLE
-                player.seekTo(player.currentPosition + 10000)
-                moreTime = 0
-            }
-        }))
-        findViewById<FrameLayout>(R.id.backwardFrameBtn).setOnClickListener(DoubleClickListener(callback = object : DoubleClickListener.Callback {
-            override fun doubleClicked() {
-                binding.playerView.showController()
-                findViewById<ImageButton>(R.id.backwardButton).visibility = View.VISIBLE
-                player.seekTo(player.currentPosition - 10000)
-                moreTime = 0
-            }
-        }))
         findViewById<ImageButton>(R.id.backButton).setOnClickListener {
             finish()
         }
@@ -237,11 +221,11 @@ class PlayerActivity : AppCompatActivity(),AudioManager.OnAudioFocusChangeListen
             if (repeat) {
                 repeat = false
                 player.repeatMode = Player.REPEAT_MODE_OFF
-                findViewById<ImageButton>(R.id.repeatButton).setImageResource(androidx.media3.ui.R.drawable.exo_legacy_controls_repeat_off)
+                findViewById<ImageButton>(R.id.repeatButton).setImageResource(com.google.android.exoplayer2.ui.R.drawable.exo_controls_repeat_one)
             } else {
                 repeat = false
                 player.repeatMode = Player.REPEAT_MODE_ONE
-                findViewById<ImageButton>(R.id.repeatButton).setImageResource(androidx.media3.ui.R.drawable.exo_legacy_controls_repeat_all)
+                findViewById<ImageButton>(R.id.repeatButton).setImageResource(com.google.android.exoplayer2.ui.R.drawable.exo_controls_repeat_off)
             }
         }
         fullScreenBtn.setOnClickListener {
@@ -471,7 +455,7 @@ class PlayerActivity : AppCompatActivity(),AudioManager.OnAudioFocusChangeListen
         videoTilte.text = playerList[position].title
         videoTilte.isSelected = true
         player = ExoPlayer.Builder(this).setTrackSelector(trackSelector).build()
-        binding.playerView.player = player
+        doubleTapEnable()
         val mediaItem = MediaItem.fromUri(playerList[position].artUri)
         player.setMediaItem(mediaItem)
         player.prepare()
@@ -503,12 +487,10 @@ class PlayerActivity : AppCompatActivity(),AudioManager.OnAudioFocusChangeListen
                 override fun onVisibilityChange(visibility: Int) {
                     when {
                         isLocked -> binding.lockButton.visibility = View.VISIBLE
-                        binding.playerView.isControllerFullyVisible -> binding.lockButton.visibility = View.VISIBLE
+                        binding.playerView.isControllerVisible -> binding.lockButton.visibility = View.VISIBLE
                         else -> binding.lockButton.visibility = View.INVISIBLE
                     }
 
-                    findViewById<ImageButton>(R.id.forwardButton).visibility = View.GONE
-                    findViewById<ImageButton>(R.id.backwardButton).visibility = View.GONE
 
                 }
             }
@@ -594,11 +576,11 @@ class PlayerActivity : AppCompatActivity(),AudioManager.OnAudioFocusChangeListen
         if (enable) {
             binding.playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
             player.videoScalingMode = C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING
-            fullScreenBtn.setImageResource(androidx.media3.ui.R.drawable.exo_ic_fullscreen_exit)
+            fullScreenBtn.setImageResource(com.google.android.exoplayer2.ui.R.drawable.exo_ic_fullscreen_exit)
         } else {
             binding.playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
             player.videoScalingMode= C.VIDEO_SCALING_MODE_SCALE_TO_FIT
-            fullScreenBtn.setImageResource(androidx.media3.ui.R.drawable.exo_ic_fullscreen_enter)
+            fullScreenBtn.setImageResource(com.google.android.exoplayer2.ui.R.drawable.exo_ic_fullscreen_enter)
         }
     }
 
@@ -659,7 +641,19 @@ class PlayerActivity : AppCompatActivity(),AudioManager.OnAudioFocusChangeListen
     }
         @SuppressLint("ClickableViewAccessibility")
         private fun doubleTapEnable(){
+
             binding.playerView.player = player
+            binding.ytOverlay.performListener(object : YouTubeOverlay.PerformListener{
+                override fun onAnimationEnd() {
+                    binding.ytOverlay.visibility = View.GONE
+                }
+
+                override fun onAnimationStart() {
+                    binding.ytOverlay.visibility = View.VISIBLE
+                }
+
+            })
+            binding.ytOverlay.player(player)
             binding.playerView.setOnTouchListener { _, motionEvent ->
                 gestureDetectorCompat.onTouchEvent(motionEvent)
                     if (motionEvent.action == MotionEvent.ACTION_UP) {

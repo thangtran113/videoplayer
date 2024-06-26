@@ -28,6 +28,7 @@ android {
     }
     kotlinOptions {
         jvmTarget = "1.8"
+//        freeCompilerArgs = ['-Xjvm-default=compatibility']
     }
     buildFeatures{
         viewBinding = true
@@ -44,10 +45,10 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation("androidx.media3:media3-exoplayer:1.3.1")
-    implementation("androidx.media3:media3-exoplayer-dash:1.3.1")
-    implementation("androidx.media3:media3-ui:1.3.1")
-    implementation ("androidx.media2:media2-session:1.2.0")
+//    implementation("androidx.media3:media3-exoplayer:1.3.1")
+//    implementation("androidx.media3:media3-exoplayer-dash:1.3.1")
+//    implementation("androidx.media3:media3-ui:1.3.1")
+//    implementation ("androidx.media2:media2-session:1.2.0")
 
     //Get video thumbail
     implementation (libs.glide)
@@ -67,7 +68,7 @@ dependencies {
     implementation ("androidx.media3:media3-exoplayer-dash:1.3.1")
     // dependency for exoplayer
 
-//    implementation ("com.google.android.exoplayer:exoplayer:2.6.0")
+    implementation ("com.google.android.exoplayer:exoplayer:2.19.1")
 //
 //// for core support in exoplayer.
 //

@@ -9,17 +9,15 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.widget.Toast
-import androidx.annotation.OptIn
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.media3.common.util.Log
-import androidx.media3.common.util.UnstableApi
 import com.android19.videoplayer.databinding.ActivityMainBinding
 import com.android19.videoplayer.databinding.ThemesViewBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -52,7 +50,7 @@ class MainActivity : AppCompatActivity() {
             MediaStore.Video.Media.SIZE + " DESC")
     }
 
-    @OptIn(UnstableApi::class)
+//    @OptIn(UnstableApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
