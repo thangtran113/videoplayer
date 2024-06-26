@@ -3,23 +3,31 @@ package com.android19.videoplayer
 import android.annotation.SuppressLint
 import android.app.AppOpsManager
 import android.app.PictureInPictureParams
-import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
+import android.content.res.Configuration
+import android.content.res.Resources
 import android.graphics.drawable.ColorDrawable
+import android.media.AudioManager
 import android.media.audiofx.LoudnessEnhancer
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.os.Process
+import android.provider.MediaStore
+import android.view.GestureDetector
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
+import android.widget.FrameLayout
+import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -30,24 +38,39 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+
 import androidx.media3.ui.AspectRatioFrameLayout
+import androidx.media3.ui.DefaultTimeBar
+import androidx.media3.ui.PlayerControlView
+import androidx.media3.ui.TimeBar
 import com.android19.videoplayer.databinding.ActivityPlayerBinding
 import com.android19.videoplayer.databinding.BoosterBinding
 import com.android19.videoplayer.databinding.MoreFeaturesBinding
 import com.android19.videoplayer.databinding.SpeedDialogBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.io.File
 import java.text.DecimalFormat
 import java.util.Locale
 import java.util.Timer
 import java.util.TimerTask
+import kotlin.math.abs
 import kotlin.system.exitProcess
 
+
 @UnstableApi
-class PlayerActivity : AppCompatActivity() {
+class PlayerActivity : AppCompatActivity(),AudioManager.OnAudioFocusChangeListener, GestureDetector.OnGestureListener{
     private lateinit var binding: ActivityPlayerBinding
-    private lateinit var runnable: Runnable
+
     private var isSubtitle:Boolean =true
     private var moreTime: Int = 0
+    private lateinit var playPauseBtn: ImageButton
+    private lateinit var fullScreenBtn: ImageButton
+    private lateinit var forwardBtn: ImageButton
+    private lateinit var backwardBtn: ImageButton
+    private lateinit var videoTilte:TextView
+    private lateinit var gestureDetectorCompat: GestureDetectorCompat
+    private var minSwipeY: Float = 0f
+
     companion object {
         private var timer: Timer? = null
 
@@ -65,9 +88,15 @@ class PlayerActivity : AppCompatActivity() {
         //
         var playbackPosition: Long = 0
         var keepPlayingId : String =""
+//
+        private var audioManager: AudioManager? = null
+        private var brightness: Int = 0
+        private var volume: Int = 0
+        ///
     }
 
-    @OptIn(UnstableApi::class)
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -78,6 +107,15 @@ class PlayerActivity : AppCompatActivity() {
         this.enableEdgeToEdge()
         setTheme(R.style.playerActivityTheme)
         setContentView(binding.root)
+
+        videoTilte = findViewById(R.id.videoTilte)
+        playPauseBtn = findViewById(R.id.playButton )
+        forwardBtn = findViewById(R.id.forwardButton )
+        backwardBtn = findViewById(R.id.backwardButton )
+        fullScreenBtn = findViewById(R.id.fullscreenButton)
+
+        gestureDetectorCompat = GestureDetectorCompat(this,this)
+
         WindowCompat.setDecorFitsSystemWindows(window, false)
         WindowInsetsControllerCompat(window, binding.root).let { controller ->
             controller.hide(WindowInsetsCompat.Type.systemBars())
@@ -88,24 +126,32 @@ class PlayerActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        initializeLayout()
-        initializeBinding()
-        binding.forwardFrameBtn.setOnClickListener(DoubleClickListener(callback = object : DoubleClickListener.Callback {
-            override fun doubleClicked() {
-                binding.playerView.showController()
-                binding.forwardButton.visibility = View.VISIBLE
-                player.seekTo(player.currentPosition + 10000)
-                moreTime = 0
+
+        //Handling file intent
+        try{
+            if(intent.data?.scheme.contentEquals("content")){
+                playerList = ArrayList()
+                position = 0
+                val cursor = contentResolver.query(intent.data!!, arrayOf(MediaStore.Video.Media.DATA),null,
+                    null,null)
+                cursor?.let {
+                    it.moveToFirst()
+                    val path = it.getString(it.getColumnIndexOrThrow(MediaStore.Video.Media.DATA))
+                    val file = File(path)
+                    val video = Video(id= "", title = file.name, duration = 0L, artUri = Uri.fromFile(file), path = path, size = ""
+                        , folderName = "")
+                    playerList.add(video)
+                    cursor.close()
+                }
+                playVideo()
+                initializeBinding()
             }
-        }))
-        binding.backwardFrameBtn.setOnClickListener(DoubleClickListener(callback = object : DoubleClickListener.Callback {
-            override fun doubleClicked() {
-                binding.playerView.showController()
-                binding.backwardButton.visibility = View.VISIBLE
-                player.seekTo(player.currentPosition - 10000)
-                moreTime = 0
+            else{
+                initializeLayout()
+                initializeBinding()
             }
-        }))
+        }catch(e:Exception){Toast.makeText(this,e.toString(),Toast.LENGTH_LONG).show()}
+
     }
 
     @SuppressLint("PrivateResource")
@@ -124,30 +170,56 @@ class PlayerActivity : AppCompatActivity() {
                 createPlayer()
             }
             "keepPlaying" ->{
+                keepPlayingId = playerList[position].id
                 speed = 1.0f
-                binding.videoTilte.text = playerList[position].title
-                binding.videoTilte.isSelected = true
+                videoTilte.text = playerList[position].title
+                videoTilte.isSelected = true
                 binding.playerView.player = player
-
                 playVideo()
                 playInFullScreen(enable = isFullScreen)
-                setVisibility()
+                seekBarFeature()
+
             }
         }
         createPlayer()
         if(repeat){
-            binding.repeatButton.setImageResource(androidx.media3.ui.R.drawable.exo_legacy_controls_repeat_all)
+            findViewById<ImageButton>(R.id.repeatButton).setImageResource(androidx.media3.ui.R.drawable.exo_legacy_controls_repeat_all)
         }
-        else binding.repeatButton.setImageResource(androidx.media3.ui.R.drawable.exo_legacy_controls_repeat_off)
+        else findViewById<ImageButton>(R.id.repeatButton).setImageResource(androidx.media3.ui.R.drawable.exo_legacy_controls_repeat_off)
     }
 
-    @SuppressLint("PrivateResource")
+    @SuppressLint("PrivateResource", "SourceLockedOrientationActivity")
     private fun initializeBinding() {
+        findViewById<ImageButton>(R.id.orientationButton).setOnClickListener {
+            requestedOrientation = if(resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT){
+                ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+            }
+            else{
+                ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+            }
+        }
 
-        binding.backButton.setOnClickListener {
+
+        findViewById<FrameLayout>(R.id.forwardFrameBtn).setOnClickListener(DoubleClickListener(callback = object : DoubleClickListener.Callback {
+            override fun doubleClicked() {
+                binding.playerView.showController()
+                findViewById<ImageButton>(R.id.forwardButton).visibility = View.VISIBLE
+                player.seekTo(player.currentPosition + 10000)
+                moreTime = 0
+            }
+        }))
+        findViewById<FrameLayout>(R.id.backwardFrameBtn).setOnClickListener(DoubleClickListener(callback = object : DoubleClickListener.Callback {
+            override fun doubleClicked() {
+                binding.playerView.showController()
+                findViewById<ImageButton>(R.id.backwardButton).visibility = View.VISIBLE
+                player.seekTo(player.currentPosition - 10000)
+                moreTime = 0
+            }
+        }))
+        findViewById<ImageButton>(R.id.backButton).setOnClickListener {
             finish()
         }
-        binding.playButton.setOnClickListener {
+        playPauseBtn.setOnClickListener {
             if (player.isPlaying) {
                 pauseVideo()
             } else {
@@ -155,24 +227,24 @@ class PlayerActivity : AppCompatActivity() {
             }
 
         }
-        binding.nextButton.setOnClickListener {
+        findViewById<ImageButton>(R.id.nextButton).setOnClickListener {
             nextPreviousVideo()
         }
-        binding.previousButton.setOnClickListener {
+        findViewById<ImageButton>(R.id.previousButton).setOnClickListener {
             nextPreviousVideo(isNext = false)
         }
-        binding.repeatButton.setOnClickListener {
+        findViewById<ImageButton>(R.id.repeatButton).setOnClickListener {
             if (repeat) {
                 repeat = false
                 player.repeatMode = Player.REPEAT_MODE_OFF
-                binding.repeatButton.setImageResource(androidx.media3.ui.R.drawable.exo_legacy_controls_repeat_off)
+                findViewById<ImageButton>(R.id.repeatButton).setImageResource(androidx.media3.ui.R.drawable.exo_legacy_controls_repeat_off)
             } else {
                 repeat = false
                 player.repeatMode = Player.REPEAT_MODE_ONE
-                binding.repeatButton.setImageResource(androidx.media3.ui.R.drawable.exo_legacy_controls_repeat_all)
+                findViewById<ImageButton>(R.id.repeatButton).setImageResource(androidx.media3.ui.R.drawable.exo_legacy_controls_repeat_all)
             }
         }
-        binding.fullscreenButton.setOnClickListener {
+        fullScreenBtn.setOnClickListener {
             if (isFullScreen) {
                 isFullScreen = false
                 playInFullScreen(enable = false)
@@ -197,7 +269,7 @@ class PlayerActivity : AppCompatActivity() {
             }
         }
         //da sua
-        binding.moreFeaturesBtn.setOnClickListener {
+        findViewById<ImageButton>(R.id.moreFeaturesBtn).setOnClickListener {
             pauseVideo()
             val customDialog =
                 LayoutInflater.from(this).inflate(R.layout.more_features, binding.root, false)
@@ -348,11 +420,11 @@ class PlayerActivity : AppCompatActivity() {
                 }
             }
             bindingMF.pipModeBtn.setOnClickListener {
-                val appOps = getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
+                val appOps = getSystemService(APP_OPS_SERVICE) as AppOpsManager
                 val status = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     appOps.checkOpNoThrow(
                         AppOpsManager.OPSTR_PICTURE_IN_PICTURE,
-                        android.os.Process.myUid(),
+                        Process.myUid(),
                         packageName
                     ) ==
                             AppOpsManager.MODE_ALLOWED
@@ -384,7 +456,11 @@ class PlayerActivity : AppCompatActivity() {
 
         }
     }
-    @OptIn(UnstableApi::class)
+
+
+
+
+
 
     private fun createPlayer() {
         try {
@@ -392,20 +468,18 @@ class PlayerActivity : AppCompatActivity() {
         } catch (e: Exception) { }
         speed = 1.0f
         trackSelector = DefaultTrackSelector(this)
-        binding.videoTilte.text = playerList[position].title
-        binding.videoTilte.isSelected = true
+        videoTilte.text = playerList[position].title
+        videoTilte.isSelected = true
         player = ExoPlayer.Builder(this).setTrackSelector(trackSelector).build()
         binding.playerView.player = player
         val mediaItem = MediaItem.fromUri(playerList[position].artUri)
         player.setMediaItem(mediaItem)
         player.prepare()
-
-        if (playbackPosition != 0L) {
-            player.seekTo(playbackPosition) // Phục hồi vị trí phát lại
-        }
-
         player.play()
         isPlayerInitialized = true
+
+
+
         player.addListener(object : Player.Listener {
             override fun onPlaybackStateChanged(playbackState: Int) {
                 super.onPlaybackStateChanged(playbackState)
@@ -417,16 +491,36 @@ class PlayerActivity : AppCompatActivity() {
             }
         })
         playInFullScreen(enable = isFullScreen)
-        setVisibility()
+
         loudnessEnhancer = LoudnessEnhancer(player.audioSessionId)
         loudnessEnhancer.enabled = true
+        keepPlayingId = playerList[position].id
+
+        seekBarFeature()
+
+        binding.playerView.setControllerVisibilityListener(
+            object : PlayerControlView.VisibilityListener {
+                override fun onVisibilityChange(visibility: Int) {
+                    when {
+                        isLocked -> binding.lockButton.visibility = View.VISIBLE
+                        binding.playerView.isControllerFullyVisible -> binding.lockButton.visibility = View.VISIBLE
+                        else -> binding.lockButton.visibility = View.INVISIBLE
+                    }
+
+                    findViewById<ImageButton>(R.id.forwardButton).visibility = View.GONE
+                    findViewById<ImageButton>(R.id.backwardButton).visibility = View.GONE
+
+                }
+            }
+        )
+
     }
 
     private fun setPlayButtonImage(isPlaying: Boolean) {
         if (isPlaying) {
-            binding.playButton.setImageResource(R.drawable.pauseicon)
+            playPauseBtn.setImageResource(R.drawable.pauseicon)
         } else {
-            binding.playButton.setImageResource(R.drawable.play_icon)
+           playPauseBtn.setImageResource(R.drawable.play_icon)
         }
     }
 
@@ -440,11 +534,12 @@ class PlayerActivity : AppCompatActivity() {
         } else {
             setPlayButtonImage(player.isPlaying)
         }
+
     }
     override fun onStop() {
         super.onStop()
         if (isPlayerInitialized) {
-            playbackPosition = player.currentPosition
+
             player.release()
             isPlayerInitialized = false
         }
@@ -452,13 +547,13 @@ class PlayerActivity : AppCompatActivity() {
 
 
     private fun playVideo() {
-        playbackPosition = player.currentPosition
-        binding.playButton.setImageResource(R.drawable.pauseicon)
+        playbackPosition = 0
+       playPauseBtn.setImageResource(R.drawable.pauseicon)
         player.play()
     }
 
     private fun pauseVideo() {
-        binding.playButton.setImageResource(R.drawable.play_icon)
+        playPauseBtn.setImageResource(R.drawable.play_icon)
         player.pause()
     }
 
@@ -494,45 +589,21 @@ class PlayerActivity : AppCompatActivity() {
         }
         player.setPlaybackSpeed(speed)
     }
-    @SuppressLint("PrivateResource")
-    private fun playInFullScreen(enable:Boolean){
-        if(enable){
+
+    private fun playInFullScreen(enable: Boolean) {
+        if (enable) {
             binding.playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
             player.videoScalingMode = C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING
-            binding.fullscreenButton.setImageResource(androidx.media3.ui.R.drawable.exo_ic_fullscreen_exit)
-        }else{
+            fullScreenBtn.setImageResource(androidx.media3.ui.R.drawable.exo_ic_fullscreen_exit)
+        } else {
             binding.playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
-            player.videoScalingMode = C.VIDEO_SCALING_MODE_SCALE_TO_FIT
-            binding.fullscreenButton.setImageResource(R.drawable.fullscreen_icon)
+            player.videoScalingMode= C.VIDEO_SCALING_MODE_SCALE_TO_FIT
+            fullScreenBtn.setImageResource(androidx.media3.ui.R.drawable.exo_ic_fullscreen_enter)
         }
     }
 
-    private fun setVisibility(){
-        runnable = Runnable{
-            if(binding.playerView.isControllerFullyVisible) changeVisibility(View.VISIBLE)
-            else changeVisibility(View.INVISIBLE)
-            Handler(Looper.getMainLooper()).postDelayed(runnable,300)
-        }
-        Handler(Looper.getMainLooper()).postDelayed(runnable,0)
-    }
-    private fun changeVisibility(visibility:Int){
-        binding.topController.visibility = visibility
-        binding.bottomController.visibility = visibility
-        binding.playButton.visibility = visibility
-
-        if(isLocked) binding.lockButton.visibility = View.VISIBLE
-        else    binding.lockButton.visibility = visibility
-        if(moreTime ==2){
-            binding.backwardButton.visibility = View.GONE
-            binding.forwardButton.visibility = View.GONE
-        }else ++moreTime
-        //khoá màn hình - ẩn
-//        binding.backwardFrameBtn.visibility = visibility
-//        binding.forwardFrameBtn.visibility = visibility
 
 
-
-    }
 
     override fun onPictureInPictureModeChanged(
         isInPictureInPictureMode: Boolean
@@ -557,5 +628,125 @@ class PlayerActivity : AppCompatActivity() {
             player.release()
             isPlayerInitialized = false
         }
+        audioManager?.abandonAudioFocus {this}
+
+
+    }
+    override fun onAudioFocusChange(focusChange:Int){
+        if(focusChange<=0){
+            pauseVideo()
+        }
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+        if (isPlayerInitialized && !player.isPlaying) {
+            player.play()
+        }else {
+            if (audioManager == null) {
+                audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
+            }
+            audioManager!!.requestAudioFocus(
+                this,
+                AudioManager.STREAM_MUSIC,
+                AudioManager.AUDIOFOCUS_GAIN
+            )
+
+            // Check if player is initialized and not playing, then play the video
+        }
+        if(brightness != 0) setScreenBrightness(brightness)
+    }
+        @SuppressLint("ClickableViewAccessibility")
+        private fun doubleTapEnable(){
+            binding.playerView.player = player
+            binding.playerView.setOnTouchListener { _, motionEvent ->
+                gestureDetectorCompat.onTouchEvent(motionEvent)
+                    if (motionEvent.action == MotionEvent.ACTION_UP) {
+                        binding.brightnessIcon.visibility = View.GONE
+                        binding.volumeIcon.visibility = View.GONE
+                        //for immersive mode
+                        WindowCompat.setDecorFitsSystemWindows(window, false)
+                        WindowInsetsControllerCompat(window, binding.root).let { controller ->
+                            controller.hide(WindowInsetsCompat.Type.systemBars())
+                            controller.systemBarsBehavior =
+                                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                        }
+
+                }
+                return@setOnTouchListener false
+            }
+        }
+        private fun seekBarFeature(){
+            findViewById<DefaultTimeBar>(R.id.exo_progress).addListener(object: TimeBar.OnScrubListener{
+                override fun onScrubStart(timeBar: TimeBar, position: Long) {
+                    pauseVideo()
+                }
+
+                override fun onScrubMove(timeBar: TimeBar, position: Long) {
+                    player.seekTo(position)
+                }
+
+                override fun onScrubStop(timeBar: TimeBar, position: Long, canceled: Boolean) {
+                    playVideo()
+                }
+
+            })
+        }
+
+    override fun onDown(e: MotionEvent): Boolean {
+        minSwipeY = 0f
+        return false
+    }
+    override fun onShowPress(e: MotionEvent) = Unit
+    override fun onSingleTapUp(e: MotionEvent): Boolean = false
+    override fun onLongPress(e: MotionEvent) = Unit
+    override fun onFling(
+        event1: MotionEvent?,
+        e2: MotionEvent,
+        velocityX: Float,
+        velocityY: Float
+    ): Boolean = false
+
+    override fun onScroll(
+        event1: MotionEvent?,
+        event2: MotionEvent,
+        distanceX: Float,
+        distanceY: Float
+    ): Boolean {
+        val sWidth = Resources.getSystem().displayMetrics.widthPixels
+
+
+        if (abs(distanceX) < abs(distanceY) && abs(minSwipeY) > 50) {
+            if (event2.x < sWidth / 2) {
+                //brightness
+                binding.brightnessIcon.visibility = View.VISIBLE
+                binding.volumeIcon.visibility = View.GONE
+                val increase = distanceY > 0
+                val newValue = if (increase) brightness + 1 else brightness - 1
+                if (newValue in 0..30) brightness = newValue
+                binding.brightnessIcon.text = brightness.toString()
+                setScreenBrightness(brightness)
+            } else {
+                //volume
+                binding.brightnessIcon.visibility = View.GONE
+                binding.volumeIcon.visibility = View.VISIBLE
+                val maxVolume = audioManager!!.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+                val increase = distanceY > 0
+                val newValue = if (increase) volume + 1 else volume - 1
+                if (newValue in 0..maxVolume) volume = newValue
+                binding.volumeIcon.text = volume.toString()
+                audioManager!!.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0)
+            }
+            minSwipeY = 0f
+        }
+
+        return true
+    }
+    private fun setScreenBrightness(value: Int){
+        val d = 1.0f/30
+        val lp = this.window.attributes
+        lp.screenBrightness = d * value
+        this.window.attributes = lp
     }
 }

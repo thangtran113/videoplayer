@@ -37,10 +37,19 @@ class VideosFragment : Fragment() {
         binding.videoRV.layoutManager = LinearLayoutManager(requireContext())
         adapter = VideoAdapter(requireContext(), MainActivity.videoList)
         binding.videoRV.adapter = adapter
-        binding.totalVideos.text = "Total videos: ${MainActivity.folderList.size}"
+
+
+        //Refresh
+        binding.root.setOnRefreshListener {
+            MainActivity.videoList = getAllVideos(requireContext())
+            adapter.updateList(MainActivity.videoList)
+
+            binding.root.isRefreshing = false
+
+        }
 
         //nowPLaying
-        binding.nowPlayingBtn.setOnClickListener{
+        binding.keepPlayingBtn.setOnClickListener{
             val intent = Intent(requireContext(),PlayerActivity::class.java)
             intent.putExtra("class","NowPlaying")
             startActivity(intent)
@@ -75,9 +84,9 @@ class VideosFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         if(PlayerActivity.position != -1) {
-            binding.nowPlayingBtn.visibility = View.VISIBLE
-            if(MainActivity.dataChanged) adapter.notifyDataSetChanged()
-            MainActivity.dataChanged = false
+            binding.keepPlayingBtn.visibility = View.VISIBLE
+            if(MainActivity.adapterChanged) adapter.notifyDataSetChanged()
+            MainActivity.adapterChanged = false
         }
     }
 }

@@ -6,15 +6,20 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.annotation.OptIn
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.media3.common.util.Log
+import androidx.media3.common.util.UnstableApi
 import com.android19.videoplayer.databinding.ActivityMainBinding
 import com.android19.videoplayer.databinding.ThemesViewBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -24,13 +29,8 @@ import kotlin.system.exitProcess
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     lateinit var toggle: ActionBarDrawerToggle
-    private val sortList = arrayOf(
-        MediaStore.Video.Media.DATE_ADDED +" DESC",
-        MediaStore.Video.Media.DATE_ADDED,
-        MediaStore.Video.Media.TITLE,
-        MediaStore.Video.Media.TITLE + " DESC",
-        MediaStore.Video.Media.SIZE,
-        MediaStore.Video.Media.SIZE + " DESC")
+
+    private var runnable: Runnable? = null
 
     companion object{
         lateinit var videoList: ArrayList<Video>
@@ -38,11 +38,21 @@ class MainActivity : AppCompatActivity() {
         lateinit var searchList: ArrayList<Video>
         var search: Boolean = false
         var themeIndex: Int = 0
-        private var sortValue:Int = 0
+        var sortValue:Int = 0
         val themesList = arrayOf(R.style.coolPinkNav, R.style.coolBlue,
             R.style.coolGreen, R.style.holoPurple, R.style.holoblueLight, R.style.darkerGrey)
         var dataChanged : Boolean = false
+        var adapterChanged : Boolean = false
+        val sortList = arrayOf(
+            MediaStore.Video.Media.DATE_ADDED +" DESC",
+            MediaStore.Video.Media.DATE_ADDED,
+            MediaStore.Video.Media.TITLE,
+            MediaStore.Video.Media.TITLE + " DESC",
+            MediaStore.Video.Media.SIZE,
+            MediaStore.Video.Media.SIZE + " DESC")
     }
+
+    @OptIn(UnstableApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -118,10 +128,22 @@ class MainActivity : AppCompatActivity() {
             folderList = ArrayList()
             videoList = getAllVideos()
             setFragment(VideosFragment())
+
+            runnable = Runnable{
+                if(dataChanged){
+                    videoList = getAllVideos()
+                    dataChanged = false
+                    adapterChanged = true
+                }
+                Log.d("MainActivity", "Runnable executed")
+                Handler(Looper.getMainLooper()).postDelayed(runnable!!,300)
+            }
+            Handler(Looper.getMainLooper()).postDelayed(runnable!!,0)
         }
 
+
         binding.bottomNav.setOnItemSelectedListener {
-            if(dataChanged) videoList = getAllVideos()
+
             when(it.itemId){
                 R.id.videoView -> setFragment(VideosFragment())
                 R.id.folderView -> setFragment(FoldersFragment())
@@ -147,7 +169,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 13)
+
+        if (requestCode == 13) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show()
                 folderList = ArrayList()
@@ -156,6 +179,8 @@ class MainActivity : AppCompatActivity() {
             } else {
                 ActivityCompat.requestPermissions(this, arrayOf(WRITE_EXTERNAL_STORAGE), 13)
             }
+        }
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -225,5 +250,10 @@ class MainActivity : AppCompatActivity() {
                 } while (cursor.moveToNext())
         cursor?.close()
         return tempList
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        runnable = null
     }
 }

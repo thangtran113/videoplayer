@@ -45,6 +45,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         return MyHolder(VideoViewBinding.inflate(LayoutInflater.from(context), parent , false))
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @OptIn(UnstableApi::class)
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
         holder.title.text = videoList[position].title
@@ -152,15 +153,15 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
               dialog.dismiss()
                 val customDialogDF =
                     LayoutInflater.from(context).inflate(R.layout.details_view, holder.root, false)
-                val bindingDF = DetailsViewBinding.bind(customDialogDF)
-                val dialogDF = MaterialAlertDialogBuilder(context).setView(customDialogDF)
+                val bindingIF = DetailsViewBinding.bind(customDialogDF)
+                val dialogIF = MaterialAlertDialogBuilder(context).setView(customDialogDF)
                     .setCancelable(false)
                     .setPositiveButton("OK"){self, _ ->
                         self.dismiss()
                     }
 
                     .create()
-                dialogDF.show()
+                dialogIF.show()
                 val detailText = SpannableStringBuilder()
                     .bold { append("Details\n\nName: ") }.append(videoList[position].title)
                     .bold { append("\n\nDuration: ") }.append(DateUtils.formatElapsedTime(videoList[position].duration/1000))
@@ -168,9 +169,53 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                     .bold { append("\n\nLocation: ") }.append(videoList[position].path)
 
 
-                bindingDF.detailTV.text = detailText
-                dialogDF.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(Color.BLUE)
+                bindingIF.detailTV.text = detailText
+                dialogIF.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(Color.BLUE)
 
+            }
+
+            bindingVMF.deleteVideo.setOnClickListener {
+                requestPermissionR()
+                dialog.dismiss()
+
+                val dialogDF = MaterialAlertDialogBuilder(context)
+                    .setTitle("Delete Video?")
+                    .setMessage(videoList[position].title)
+                    .setCancelable(false)
+                    .setPositiveButton("YES"){self, _ ->
+                        val file = File(videoList[position].path)
+                        if(file.exists() && file.delete()){
+                            MediaScannerConnection.scanFile(context, arrayOf(file.path), arrayOf("video/*"), null)
+                            when{
+                                MainActivity.search -> {
+                                    MainActivity.dataChanged = true
+                                    videoList.removeAt(position)
+                                    notifyDataSetChanged()
+                                }
+                                isFolder -> {
+                                    MainActivity.dataChanged = true
+                                    FoldersActivity.currentFolderVideo.removeAt(position)
+                                    notifyDataSetChanged()
+                                }
+                                else ->{
+                                    MainActivity.videoList.removeAt(position)
+                                    notifyDataSetChanged()
+                                }
+                            }
+                        }
+                            else{
+                                Toast.makeText(context,"Permission Denied!", Toast.LENGTH_SHORT).show()
+                        }
+                            self.dismiss()
+                    }
+                    .setNegativeButton("NO"){self, _ ->
+                        self.dismiss()
+                    }
+                    .create()
+                dialogDF.show()
+
+                dialogDF.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(Color.BLUE)
+                dialogDF.getButton(AlertDialog.BUTTON_NEGATIVE).setBackgroundColor(Color.BLUE)
             }
 
             return@setOnLongClickListener true

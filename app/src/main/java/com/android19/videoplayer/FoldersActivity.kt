@@ -39,7 +39,7 @@ class FoldersActivity : AppCompatActivity() {
         return true
     }
     @SuppressLint("Range","InlineApi","Recycle")
-    private fun getAllVideos(folderId: String): ArrayList<Video> {
+   fun getAllVideos(folderId: String): ArrayList<Video> {
         val tempList = ArrayList<Video>()
         val selection = MediaStore.Video.Media.BUCKET_ID + " LIKE ?"
         val projection = arrayOf(

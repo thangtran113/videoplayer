@@ -6,7 +6,7 @@
     </style>
     <attr name="themeColor" format="color"/>
 
-
+    <style name="darker_Grey">#585d66</style>
     //for dialog
     <style name="alertDialog" parent="Theme.AppCompat.Dialog.Alert">
         <item name="android:textColor">@color/white</item>
@@ -104,5 +104,9 @@
         <item name="colorOnSecondary">@color/black</item>
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+    </style>
+
+    <style name="CardView." parent="CardView">
+        <item name="android:background">@drawable/gradient_colors</item>
     </style>
 </resources>
