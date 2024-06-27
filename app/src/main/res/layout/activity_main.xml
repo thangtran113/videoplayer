@@ -28,8 +28,9 @@
             android:layout_height="70dp"
             android:background="@color/white"
             app:itemIconTint="?attr/themeColor"
-            app:itemTextColor="@android:color/black"
-            app:menu="@menu/bottom_nav" />
+            app:itemTextColor="@color/black"
+            app:menu="@menu/bottom_nav"
+            app:itemIconSize="30dp"/>
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <com.google.android.material.navigation.NavigationView
@@ -40,8 +41,11 @@
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
         app:menu="@menu/nav_menu"
-        app:itemIconTint="@color/black"
+        app:itemIconTint="?attr/themeColor"
         app:headerLayout="@layout/nav_header"
         app:itemTextAppearanceActiveBoldEnabled="true"
-        app:itemIconSize="20sp"/>
+        app:itemIconSize="20sp"
+
+
+        />
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -6,7 +6,13 @@
     android:layout_height="200dp"
     android:background="@drawable/background_nav"
     >
-
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/icon_video_player"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="90dp"
+        />
     <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
@@ -14,9 +20,9 @@
         android:text="@string/navText1"
         android:fontFamily="@font/lufgablack"
         android:textStyle="bold"
-        android:textSize="40dp"
+        android:textSize="35dp"
         android:textColor="@android:color/black"
-        android:layout_marginTop="125dp"
+
         android:layout_marginLeft="15dp"
 
 

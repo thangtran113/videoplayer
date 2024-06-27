@@ -53,7 +53,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
             .asBitmap()
             .load(videoList[position].artUri)
             .diskCacheStrategy(DiskCacheStrategy.ALL)
-            .apply(RequestOptions().placeholder(R.mipmap.ic_video_player).centerCrop())
+            .apply(RequestOptions().placeholder(R.drawable.icon_video_player).centerCrop())
             .into(holder.image)
         holder.root.setOnClickListener {
             when{

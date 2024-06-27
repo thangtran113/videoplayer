@@ -73,24 +73,5 @@ dependencies {
     // dependency for exoplayer
 
     implementation ("com.google.android.exoplayer:exoplayer:2.19.1")
-//
-//// for core support in exoplayer.
-//
-//    implementation ("com.google.android.exoplayer:exoplayer-core:r2.4.0")
-//
-//// for adding dash support in our exoplayer.
-//
-//    implementation ("com.google.android.exoplayer:exoplayer-dash:r2.4.0’")
-//
-//// for adding hls support in exoplayer.
-//
-//    implementation ("com.google.android.exoplayer:exoplayer-hls:r2.4.0")
-//
-//// for smooth streaming of video in our exoplayer.
-//
-//    implementation ("com.google.android.exoplayer:exoplayer-smoothstreaming:r2.4.0")
-//
-//// for generating default ui of exoplayer
-//
-//    implementation ("com.google.android.exoplayer:exoplayer-ui:r2.4.0")
+
 }

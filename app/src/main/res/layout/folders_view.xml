@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="60dp"
     android:layout_margin="5dp"
-    app:cardCornerRadius="10dp">
+    app:cardCornerRadius="10dp"
+    android:layout_marginTop="5dp">
 
     <com.google.android.material.imageview.ShapeableImageView
         android:layout_width="70dp"
@@ -12,7 +13,8 @@
         android:contentDescription="@string/image"
         android:src="@drawable/folders_icon"
         android:tint="?attr/themeColor"
-        android:padding="13dp"/>
+        android:padding="13dp"
+        android:layout_margin="5dp"/>
 
 
     <TextView
@@ -21,7 +23,7 @@
         android:layout_height="match_parent"
         android:textColor="@color/black"
         android:text="@string/folder_name"
-        android:textSize="18sp"
+        android:textSize="20sp"
 
         android:gravity="center_vertical"
         android:layout_marginHorizontal="5dp"

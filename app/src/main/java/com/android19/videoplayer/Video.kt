@@ -20,7 +20,8 @@ data class Video(val id: String,
 data class Folder(val id: String,
                   val folderName: String
 )
-@SuppressLint("Range", "SuspiciousIndentation")
+
+@SuppressLint("Range")
 fun getAllVideos(context: Context): ArrayList<Video> {
     val sortEditor = context.getSharedPreferences("Sorting", AppCompatActivity.MODE_PRIVATE)
     MainActivity.sortValue = sortEditor.getInt("sortValue", 0)

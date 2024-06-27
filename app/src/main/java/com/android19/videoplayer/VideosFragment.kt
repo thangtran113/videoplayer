@@ -82,6 +82,7 @@ class VideosFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         if(PlayerActivity.position != -1) {
+
             binding.keepPlayingBtn.visibility = View.VISIBLE
             if(MainActivity.adapterChanged) adapter.notifyDataSetChanged()
             MainActivity.adapterChanged = false
