@@ -1,0 +1,32 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Items from header_menu.xml -->
+
+
+<!--    &lt;!&ndash; Divider &ndash;&gt;-->
+<!--    <item-->
+<!--        android:title="Divider"-->
+<!--        android:enabled="false">-->
+<!--        <menu>-->
+<!--            <item android:title=" " android:enabled="false" />-->
+<!--        </menu>-->
+<!--    </item>-->
+
+    <!-- Items from nav_menu.xml -->
+    <item
+        android:id="@+id/themes"
+        android:icon="@drawable/themes_icon"
+        android:title="Themes"
+        android:iconTint="?attr/themeColor"/>
+    <item
+        android:id="@+id/sort"
+        android:icon="@drawable/sort_icon"
+        android:title="Sort"
+        android:iconTint="?attr/themeColor"/>
+
+    <item
+        android:id="@+id/exit"
+        android:icon="@drawable/exit_icon"
+        android:title="Exit"
+        android:iconTint="?attr/themeColor"/>
+
+</menu>

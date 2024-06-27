@@ -32,13 +32,10 @@ import androidx.media3.exoplayer.SimpleExoPlayer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.AspectRatioFrameLayout
 import com.android19.videoplayer.databinding.ActivityPlayerBinding
-
 import com.android19.videoplayer.databinding.BoosterBinding
-
+import com.android19.videoplayer.databinding.MoreFeaturesBinding
 import com.android19.videoplayer.databinding.SpeedDialogBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-
-import com.android19.videoplayer.databinding.MoreFeaturesBinding
 import java.text.DecimalFormat
 import java.util.Locale
 import java.util.Timer
@@ -50,6 +47,9 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
     private lateinit var runnable: Runnable
     private var isSubtitle:Boolean =true
+
+
+
     companion object {
         private var timer: Timer? = null
 
@@ -64,11 +64,28 @@ class PlayerActivity : AppCompatActivity() {
         private lateinit var trackSelector: DefaultTrackSelector
         private lateinit var loudnessEnhancer: LoudnessEnhancer
         private var speed: Float = 1.0f
+
+        //lateinit var dialogProperties: DialogProperties
+        //lateinit var filePickerDialog: FilePickerDialog
+        // uriSubtitle: Uri? = null
+        //import com.developer.filepicker.model.DialogConfigs
+        //import com.developer.filepicker.model.DialogProperties
+       //import com.developer.filepicker.view.FilePickerDialog
         //
     }
 
     @OptIn(UnstableApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        /*dialogProperties =  DialogProperties()
+        filePickerDialog = FilePickerDialog(this@PlayerActivity)
+        filePickerDialog.setTitle("Chose sub")
+        filePickerDialog.setNegativeBtnName("OK")
+        filePickerDialog.setPositiveBtnName("Cancel")
+*/
+
+
+
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -228,6 +245,31 @@ class PlayerActivity : AppCompatActivity() {
                         ).build()
                     Toast.makeText(this, "Subtitles ON", Toast.LENGTH_SHORT).show()
                     isSubtitle = true
+
+                    val videoTitle = playerList[position].title
+                    val intent = Intent(this@PlayerActivity, MainActivity2::class.java)
+
+                    intent.putExtra("video_title", videoTitle)
+
+// Khởi chạy SecPage bằng cách gọi startActivity()
+                    startActivity(intent)
+
+
+                /*    dialogProperties.selection_mode = DialogConfigs.SINGLE_MODE
+                    dialogProperties.extensions = arrayOf("srt")
+                    dialogProperties.root = File("/storage/emulated/0")
+                    filePickerDialog.setProperties(dialogProperties)
+                    filePickerDialog.show()
+                    filePickerDialog.setDialogSelectionListener { files ->
+                        files.firstOrNull()?.let { path ->
+                            val file = File(path)
+                            uriSubtitle = Uri.parse(file.absolutePath)
+                        }
+                        playVideoSubtitle(uriSubtitle)
+                    }*/
+
+
+
                 }
                 dialog.dismiss()
                 playVideo()
@@ -404,11 +446,88 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
+
+
     private fun playVideo() {
         binding.playButton.setImageResource(R.drawable.pauseicon)
         player.play()
     }
 
+    /*
+    private fun playVideoSubtitle2(subtitle: Uri?) {
+        long oldPosition = player.getCurrentPosition()
+        player.stop()
+
+
+        String path = mVideoFiles.get(position).getPath()
+        Uri uri = Uri.parse (path)
+        player = new SimpleExoPlayer.Builder(this).build()
+        DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory
+        (this,Util.getUserAgent(this,"app"));
+        concatenatingMediaSource = new ConcatenatingMediaSource()
+
+        for (int i=0;i<mVideoFiles.size();i++){
+            new File(String.valueOf(mVideoFiles.get(i)))
+            MediaSource mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(Uri.parse(String.valueOf(uri)))
+
+
+        Format textFormat = Format.createTextSampleFormat(null, MimeTypes.APPLICATION_SUBRIP,Format.NO_VALUE,"app"))
+        MediaSource subtitleSource = new SingleSampleMediaSource.Factory(dataSourceFactory)
+            .setTreatLoadErrorsAsEndOfStream(true)
+            .createMediaSource(Uri.parse(String.valuesOf(subtitle)),textFormat,C.TIME_UNSET)
+        MergingMediaSource mergingMediamediaSource = new MergingMediaSource(mediaSource,subtitleSource)
+
+            concatenatingMediaSource.addMediaSource(mergingMediamediaSource)
+        }
+        player.seekTo(position,oldPosition)
+        binding.playButton.setImageResource(R.drawable.pauseicon)
+        player.play()
+    }
+
+  private fun playVideoSubtitle(subtitle: Uri?) {
+        val oldPosition = player.currentPosition
+        player.stop()
+        val path = playerList[position].path
+        val uri = Uri.parse(path)
+        player = SimpleExoPlayer.Builder(this).build()
+        val dataSourceFactory = DefaultDataSourceFactory(this, Util.getUserAgent(this, "app"))
+        val concatenatingMediaSource = ConcatenatingMediaSource()
+
+        for (i in playerList.indices) {
+            val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(MediaItem.fromUri(playerList[i].toString()))
+
+
+
+            val textFormat = Format.Builder()
+                .setSampleMimeType(MimeTypes.APPLICATION_SUBRIP)
+                .setLanguage("app") // Assuming 'app' is the language code
+                .build()
+            val subtitleConfiguration = MediaItem.SubtitleConfiguration.Builder(Uri.parse(subtitle.toString()))
+                .setMimeType(MimeTypes.APPLICATION_SUBRIP)
+                .setLanguage("en")
+                .build()
+            val durationUs = C.TIME_UNSET
+            val subtitleSource = SingleSampleMediaSource.Factory(dataSourceFactory)
+                .setTreatLoadErrorsAsEndOfStream(true)
+                .createMediaSource(MediaItem.SubtitleConfiguration.Builder(Uri.parse("https://example.com/subtitle.srt"))
+                    .setMimeType(MimeTypes.APPLICATION_SUBRIP)
+                    .setLanguage("en") // Set the language of the subtitles
+                    .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
+                    .build(), durationUs)
+            val mergingMediaSource = MergingMediaSource(mediaSource, subtitleSource)
+
+            concatenatingMediaSource.addMediaSource(mergingMediaSource)
+        }
+
+        player.setMediaSource(concatenatingMediaSource)
+        player.seekTo(position, oldPosition)
+        binding.playButton.setImageResource(R.drawable.pauseicon)
+        player.play()
+    }
+
+*/
     private fun pauseVideo() {
         binding.playButton.setImageResource(R.drawable.play_icon)
         player.pause()
@@ -500,3 +619,4 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 }
+

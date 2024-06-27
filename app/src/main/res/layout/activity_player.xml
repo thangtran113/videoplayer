@@ -15,7 +15,14 @@
         app:controller_layout_id="@layout/custom_control_view"
         android:keepScreenOn="true"
         />
-
+    <androidx.media3.ui.SubtitleView
+        android:id="@+id/subtitleView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
     <LinearLayout
         android:id="@+id/topController"
         android:layout_width="match_parent"
